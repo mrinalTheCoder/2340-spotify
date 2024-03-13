@@ -1,4 +1,4 @@
-package com.example.spotifywrapped;
+package com.example.spotify_wrapped;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.example.spotifywrapped.databinding.FragmentSecondBinding;
+import com.example.spotify_wrapped.databinding.FragmentSecondBinding;
 
 public class SecondFragment extends Fragment {
 
