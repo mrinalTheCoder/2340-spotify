@@ -1,4 +1,4 @@
-package com.example.spotifywrapped;
+package com.example.spotify_wrapped;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.example.spotifywrapped", appContext.getPackageName());
+        assertEquals("com.example.spotify_wrapped", appContext.getPackageName());
     }
 }
