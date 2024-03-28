@@ -1,4 +1,4 @@
-package com.example.spotify_wrapped;
+package com.example.spotifywrapped;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,8 +26,8 @@ import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String CLIENT_ID = "62567b7c8c3a4d6f9a60d1aaac5e9086";
-    public static final String REDIRECT_URI = "SpotifyWrapped://auth";
+    public static final String CLIENT_ID = "a10c32b0e8874c7e90984cb15053dbc1";
+    public static final String REDIRECT_URI = "com.example.spotifywrapped://auth";
 
     public static final int AUTH_TOKEN_REQUEST_CODE = 0;
     public static final int AUTH_CODE_REQUEST_CODE = 1;
