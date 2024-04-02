@@ -30,7 +30,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Adjust these to match your Redirect URI -->
-                <data android:scheme="com.example.spotifywrapped"
+                <data android:scheme="spotifywrapped"
                     android:host="auth" />
             </intent-filter>
 
