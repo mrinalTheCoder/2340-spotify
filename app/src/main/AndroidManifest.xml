@@ -25,14 +25,14 @@
             <intent-filter>
                 <data android:host="auth" android:scheme="spotifywrapped"/>
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <!-- Adjust these to match your Redirect URI -->
-                <data android:scheme="spotifywrapped"
-                    android:host="auth" />
-            </intent-filter>
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.VIEW" />-->
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--                <category android:name="android.intent.category.BROWSABLE" />-->
+<!--                &lt;!&ndash; Adjust these to match your Redirect URI &ndash;&gt;-->
+<!--                <data android:scheme="spotifywrapped"-->
+<!--                    android:host="auth" />-->
+<!--            </intent-filter>-->
 
         </activity>
     </application>
