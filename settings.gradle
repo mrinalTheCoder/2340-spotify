@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Spotify Wrapped"
-include(":app")
+rootProject.name = "Spotify_Wrapped"
+include ':app'
