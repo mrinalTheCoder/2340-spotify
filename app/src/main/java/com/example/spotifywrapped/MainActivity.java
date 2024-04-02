@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     final JSONObject jsonObject = new JSONObject(response.body().string());
                     setTextAsync(jsonObject.toString(3), profileTextView);
-                } catch (JSONE xception e) {
+                } catch (JSONException e) {
                     Log.d("JSON", "Failed to parse data: " + e);
                     Toast.makeText(MainActivity.this, "Failed to parse data, watch Logcat for more details",
                             Toast.LENGTH_SHORT).show();
