@@ -23,7 +23,7 @@
             </intent-filter>
 
             <intent-filter>
-                <data android:host="auth" android:scheme="com.example.spotifywrapped"/>
+                <data android:host="auth" android:scheme="spotifywrapped"/>
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
