@@ -1,3 +1,4 @@
+
 name: Android Build
 
 on: push
@@ -15,6 +16,10 @@ jobs:
           java-version: "21"
           distribution: "temurin"
 
+      - name: Load Google Service file
+        env:
+          DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: echo $DATA | base64 -di > app/google-services.json
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
