@@ -1,4 +1,5 @@
 package com.example.spotifywrapped;
+import androidx.lifecycle.ViewModelProvider;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -6,8 +7,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.view.View;
 import android.widget.Toast;
+
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
@@ -23,7 +29,6 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-
 public class MainActivity extends AppCompatActivity {
 
     public static final String CLIENT_ID = "17c3cc6f018c42ce8e1f55bc13f61d99";
@@ -52,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         Button tokenBtn = (Button) findViewById(R.id.token_btn);
         Button codeBtn = (Button) findViewById(R.id.code_btn);
         Button profileBtn = (Button) findViewById(R.id.profile_btn);
+        Button wrappedBtn = (Button) findViewById(R.id.wrapped_btn);
 
         // Set the click listeners for the buttons
 
@@ -67,6 +73,29 @@ public class MainActivity extends AppCompatActivity {
             onGetUserProfileClicked();
         });
 
+        wrappedBtn.setOnClickListener((v) -> {
+            openWrapped();
+        });
+
+    }
+    public void openWrapped() {
+        LinearLayout la = findViewById(R.id.startBtns);
+        la.setVisibility(View.GONE);
+        // Bundle to hold the data
+        Bundle bundle = new Bundle();
+        bundle.putString("mAccessToken", mAccessToken);
+        bundle.putString("mAccessCode", mAccessCode);
+
+        // Create fragment instance and set arguments
+        WrappedFragment fragment = new WrappedFragment();
+        fragment.setArguments(bundle);
+
+        // Transaction
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, fragment);
+        fragmentTransaction.addToBackStack(null); // Optional for back button
+        fragmentTransaction.commit();
     }
 
     /**
@@ -96,18 +125,22 @@ public class MainActivity extends AppCompatActivity {
      * When the app leaves this activity to momentarily get a token/code, this function
      * fetches the result of that external activity to get the response from Spotify
      */
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         final AuthorizationResponse response = AuthorizationClient.getResponse(resultCode, data);
 
+        SharedApiTokenViewModel viewModel = new ViewModelProvider(this).get(SharedApiTokenViewModel.class);
         // Check which request code is present (if any)
         if (AUTH_TOKEN_REQUEST_CODE == requestCode) {
             mAccessToken = response.getAccessToken();
+            viewModel.setApiToken(mAccessToken);
             setTextAsync(mAccessToken, tokenTextView);
 
         } else if (AUTH_CODE_REQUEST_CODE == requestCode) {
             mAccessCode = response.getCode();
+            viewModel.setApiToken(mAccessCode);
             setTextAsync(mAccessCode, codeTextView);
         }
     }
@@ -173,7 +206,7 @@ public class MainActivity extends AppCompatActivity {
     private AuthorizationRequest getAuthenticationRequest(AuthorizationResponse.Type type) {
         return new AuthorizationRequest.Builder(CLIENT_ID, type, getRedirectUri().toString())
                 .setShowDialog(false)
-                .setScopes(new String[] { "user-read-email" }) // <--- Change the scope of your requested token here
+                .setScopes(new String[] { "user-read-email", "user-top-read" }) // <--- Change the scope of your requested token here
                 .setCampaign("your-campaign-token")
                 .build();
     }
