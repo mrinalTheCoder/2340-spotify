@@ -1,64 +1,85 @@
 package com.example.spotifywrapped;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link LLMFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class LLMFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private EditText userMusicInput;
+    private EditText friendMusicInput;
+    private TextView descriptionOutput;
 
     public LLMFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment LLMFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static LLMFragment newInstance(String param1, String param2) {
-        LLMFragment fragment = new LLMFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    public static LLMFragment newInstance() {
+        return new LLMFragment();
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_llm, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        userMusicInput = view.findViewById(R.id.userMusicInput);
+        friendMusicInput = view.findViewById(R.id.friendMusicInput);
+        Button generateDescriptionBtn = view.findViewById(R.id.generateDescriptionBtn);
+        Button compareWithFriendBtn = view.findViewById(R.id.compareWithFriendBtn);
+        descriptionOutput = view.findViewById(R.id.descriptionOutput);
+
+        OpenAIAPIService apiService = new OpenAIAPIService();
+
+        generateDescriptionBtn.setOnClickListener(v -> {
+            String userTaste = userMusicInput.getText().toString();
+            apiService.generateText("Describe a person who listens to a lot of " + userTaste + ".", new OpenAIAPIService.ApiServiceCallback() {
+                @Override
+                public void onSuccess(String result) {
+                    updateTextView(result);
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    e.printStackTrace();
+                    updateTextView("Failed to generate description. Please try again.");
+                }
+            });
+        });
+
+        compareWithFriendBtn.setOnClickListener(v -> {
+            String userTaste = userMusicInput.getText().toString();
+            String friendTaste = friendMusicInput.getText().toString();
+            // This is a placeholder. You'll need to implement a method in your API service
+            // that can handle a comparison between two inputs.
+            apiService.compareTastes(userTaste, friendTaste, new OpenAIAPIService.ApiServiceCallback() {
+                @Override
+                public void onSuccess(String result) {
+                    updateTextView(result);
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    e.printStackTrace();
+                    updateTextView("Failed to compare tastes. Please try again.");
+                }
+            });
+        });
+    }
+
+    private void updateTextView(String text) {
+        if (getActivity() == null) return;
+        getActivity().runOnUiThread(() -> descriptionOutput.setText(text));
     }
 }

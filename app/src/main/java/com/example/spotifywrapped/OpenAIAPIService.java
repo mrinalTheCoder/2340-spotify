@@ -1,66 +1,27 @@
 package com.example.spotifywrapped;
 
-import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.os.Handler;
 import android.os.Looper;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
+import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-public class LLMFragment extends Fragment {
+public class OpenAIAPIService {
 
-    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
-    OkHttpClient client = new OkHttpClient();
-
-    String jsonBody = "{\"prompt\": \"Describe a person who listens to a lot of indie rock.\", \"max_tokens\": 100}";
-    RequestBody body = RequestBody.create(jsonBody, MediaType.get("application/json; charset=utf-8"));
-    Request request = new Request.Builder()
-            .url("https://api.openai.com/v1/engines/davinci/completions")
-            .addHeader("Authorization", "Bearer YOUR_API_KEY")
-            .post(body)
-            .build();
-
-    client.newCall(request).enqueue(new Callback() {
-        @Override
-        public void onFailure(@NotNull Call call, @NotNull IOException e) {
-            // Handle failure
-            e.printStackTrace();
-        }
-
-        @Override
-        public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-            if (!response.isSuccessful()) {
-                throw new IOException("Unexpected code " + response);
-            }
-            // Handle success
-            String responseBody = response.body().string();
-            // Update your UI using the main thread
-        }
-    });
-
-    private static final String SERVER_URL = "https://yourserver.com/generate-text";
+    private static final String SERVER_URL = "http://10.0.2.2:3000/generate-text";
     private static final MediaType JSON = MediaType.get("application/json; charset=utf-8");
 
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
     private OkHttpClient client = new OkHttpClient();
     private Handler mainThreadHandler = new Handler(Looper.getMainLooper());
 
-    public void generateText(String prompt, Callback callback) {
+    public void generateText(String prompt, ApiServiceCallback callback) {
         executorService.execute(() -> {
             String json = "{\"prompt\": \"" + prompt + "\", \"max_tokens\": 100}";
             RequestBody body = RequestBody.create(json, JSON);
@@ -69,19 +30,56 @@ public class LLMFragment extends Fragment {
                     .post(body)
                     .build();
 
-            try (Response response = client.newCall(request).execute()) {
-                if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    mainThreadHandler.post(() -> callback.onError(e));
+                }
 
-                String result = response.body().string();
-                mainThreadHandler.post(() -> callback.onSuccess(result));
-            } catch (IOException e) {
-                e.printStackTrace();
-                mainThreadHandler.post(() -> callback.onError(e));
-            }
+                @Override
+                public void onResponse(Call call, okhttp3.Response response) throws IOException {
+                    if (!response.isSuccessful()) {
+                        callback.onError(new IOException("Unexpected code " + response));
+                        return;
+                    }
+                    String result = response.body().string();
+                    mainThreadHandler.post(() -> callback.onSuccess(result));
+                }
+            });
+        });
+    }
+    public void compareTastes(String userTaste, String friendTaste, ApiServiceCallback callback) {
+        executorService.execute(() -> {
+            // Assuming the server expects a JSON with two fields: userPrompt and friendPrompt
+            String json = "{\"userPrompt\": \"" + userTaste + "\", \"friendPrompt\": \"" + friendTaste + "\"}";
+            RequestBody body = RequestBody.create(json, JSON);
+            // Update SERVER_URL to the URL of the new endpoint
+            String compareUrl = SERVER_URL.replace("generate-text", "compare-tastes");
+            Request request = new Request.Builder()
+                    .url(compareUrl)
+                    .post(body)
+                    .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    mainThreadHandler.post(() -> callback.onError(e));
+                }
+
+                @Override
+                public void onResponse(Call call, okhttp3.Response response) throws IOException {
+                    if (!response.isSuccessful()) {
+                        callback.onError(new IOException("Unexpected code " + response));
+                        return;
+                    }
+                    String result = response.body().string();
+                    mainThreadHandler.post(() -> callback.onSuccess(result));
+                }
+            });
         });
     }
 
-    public interface Callback {
+    public interface ApiServiceCallback {
         void onSuccess(String result);
         void onError(Exception e);
     }
