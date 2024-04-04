@@ -31,3 +31,7 @@ app/google-services.json
 
 # Android Profiling
 *.hprof
+
+#OpenAI
+*.env
+
