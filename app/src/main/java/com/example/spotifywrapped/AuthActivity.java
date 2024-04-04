@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
@@ -44,6 +45,7 @@ public class AuthActivity extends AppCompatActivity {
             // intent to MainActivity that returns the user
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
+            finish();
         }
     }
 
@@ -69,8 +71,15 @@ public class AuthActivity extends AppCompatActivity {
             // go back to main activity
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
+            finish();
             // ...
         } else {
+            if (response == null) {
+                Toast.makeText(this, "Sign-in cancelled", Toast.LENGTH_LONG).show();
+            } else {
+                int errorCode = response.getError().getErrorCode();
+                Toast.makeText(this, "Sign-in failed: " + errorCode, Toast.LENGTH_LONG).show();
+            }
             // Sign in failed. If response is null the user canceled the
             // sign-in flow using the back button. Otherwise check
             // response.getError().getErrorCode() and handle the error.
