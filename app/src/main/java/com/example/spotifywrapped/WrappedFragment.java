@@ -3,25 +3,22 @@ package com.example.spotifywrapped;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import android.widget.Button;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 
-import com.spotify.sdk.android.auth.AuthorizationClient;
-import com.spotify.sdk.android.auth.AuthorizationRequest;
-import com.spotify.sdk.android.auth.AuthorizationResponse;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -29,11 +26,12 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -57,7 +55,8 @@ public class WrappedFragment extends Fragment {
 
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
 
-    private TextView infoTextView;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseUser currentUser;
 
     public WrappedFragment() {
         // Required empty public constructor
@@ -81,6 +80,7 @@ public class WrappedFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (getArguments() != null) {
             mAccessToken = getArguments().getString("mAccessToken");
         }
@@ -98,6 +98,37 @@ public class WrappedFragment extends Fragment {
         getWrappedData(view);
 
         return view;
+    }
+
+    private void saveToFirestore(
+            ArrayList<String> topArtists,
+            ArrayList<String> topSongs,
+            ArrayList<String> genre,
+            ArrayList<Double> audioFeatures,
+            ArrayList<String> recArtists,
+            String LLMOutput) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("time", new Date());
+        data.put("topArtists", topArtists);
+        data.put("topSongs", topSongs);
+        data.put("genre", genre);
+        data.put("audioFeatures", audioFeatures);
+        data.put("recArtists", recArtists);
+        data.put("LLMOutput", LLMOutput);
+        db.collection("spotify_data").document(currentUser.getUid())
+                .set(data)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("firestore", "DocumentSnapshot successfully written!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("firestore", "Error adding document", e);
+                    }
+                });
     }
 
     public void getWrappedData(View view) {
@@ -141,10 +172,10 @@ public class WrappedFragment extends Fragment {
                                                     Log.w("Top Genres", genre.toString());
                                                     Log.w("Audio Features", audioFeatures.toString());
                                                     Log.w("Recommended Artists", recArtists.toString());
+                                                    String LLMOutput = "TODO: LLM output";
+                                                    saveToFirestore(topArtists, topSongs, genre, audioFeatures, recArtists, LLMOutput);
                                                 }
                                             });
-
-
                                         }
 
                                     });
