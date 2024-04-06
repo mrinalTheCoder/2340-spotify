@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import android.view.ViewGroup;
@@ -115,12 +116,12 @@ public class WrappedFragment extends Fragment {
         data.put("audioFeatures", audioFeatures);
         data.put("recArtists", recArtists);
         data.put("LLMOutput", LLMOutput);
-        db.collection("spotify_data").document(currentUser.getUid())
-                .set(data)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
+        db.collection(currentUser.getUid())
+                .add(data)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d("firestore", "DocumentSnapshot successfully written!");
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d("firestore", "DocumentSnapshot written with ID: " + documentReference.getId());
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
