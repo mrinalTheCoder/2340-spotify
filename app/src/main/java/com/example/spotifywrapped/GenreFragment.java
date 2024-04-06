@@ -1,4 +1,7 @@
 package com.example.spotifywrapped;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -77,8 +80,28 @@ public class GenreFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         LinearLayout myLinearLayout = view.findViewById(R.id.genreLayout);
+
+
+
+        HashMap<String, Integer> ans = new HashMap<>();
         for (String g : genre) {
-            Log.w("somethig", g);
+            if (ans.get(g) == null) {
+                ans.put(g, 1);
+            } else {
+                ans.put(g, ans.get(g) + 1);
+            }
+        }
+        ArrayList<HashMap.Entry<String, Integer>> entryList = new ArrayList<>(ans.entrySet());
+
+        Collections.sort(entryList, (entry1, entry2) -> entry2.getValue().compareTo(entry1.getValue()));
+
+        ArrayList<String> sortedStrings = new ArrayList<>();
+        for (HashMap.Entry<String, Integer> entry : entryList) {
+            sortedStrings.add(entry.getKey());
+        }
+
+
+        for (String g : sortedStrings) {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
             TextView genreTextView = (TextView) inflater.inflate(R.layout.textview, myLinearLayout, false);
             genreTextView.setText(g);

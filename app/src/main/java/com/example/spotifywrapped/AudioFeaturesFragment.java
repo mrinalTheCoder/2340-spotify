@@ -21,6 +21,8 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -75,11 +77,20 @@ public class AudioFeaturesFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         LinearLayout myLinearLayout = view.findViewById(R.id.audioFeaturesLayout);
-        for (Double g : audioFeatures) {
-            Log.w("somethig", "" +g);
+
+        ArrayList<String> features = new ArrayList<>();
+        features.add("Danceability");
+        features.add("Acousticness");
+        features.add("Energy");
+        features.add("Liveness");
+        features.add("Valence");
+
+        Collections.sort(features, (string1, string2) -> ((Double) audioFeatures[features.indexOf(string2)]).compareTo(audioFeatures[features.indexOf(string1)]));
+
+        for (String g : features) {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
             TextView audioFeaturesTextView = (TextView) inflater.inflate(R.layout.textview, myLinearLayout, false);
-            audioFeaturesTextView.setText(g.toString());
+            audioFeaturesTextView.setText(g);
             myLinearLayout.addView(audioFeaturesTextView);
         }
     }
