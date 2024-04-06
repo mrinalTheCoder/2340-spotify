@@ -36,6 +36,7 @@ import okhttp3.Response;
 public class TopArtistsFragment extends Fragment {
 
     private Call mCall;
+    public ArrayList<String> topArtists = new ArrayList<>();
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
 
     public static final String REDIRECT_URI = "spotifywrapped://auth";
@@ -69,72 +70,23 @@ public class TopArtistsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view =   inflater.inflate(R.layout.fragment_top_artists, container, false);
+        ArrayList<String> topArtists = getArguments().getStringArrayList("top_artists");
+        this.topArtists = topArtists;
+
         return view;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        // API Token Logic
-        SharedApiTokenViewModel viewModel = new ViewModelProvider(requireActivity()).get(SharedApiTokenViewModel.class);
-        viewModel.getApiToken().observe(getViewLifecycleOwner(), apiToken -> {
-            getUserTopArtists(apiToken, new TopArtistsCallback() {
-                @Override
-                public void onTopArtistsReceived(ArrayList<String> topArtists) {
-                    requireActivity().runOnUiThread(() -> {
-                        LinearLayout myLinearLayout = view.findViewById(R.id.topArtistsLayout);
-                        for (String artistName : topArtists) {
-                            LayoutInflater inflater = LayoutInflater.from(getActivity());
-                            TextView artistTextView = (TextView) inflater.inflate(R.layout.textview, myLinearLayout, false);
-                            artistTextView.setText(artistName);
-                            myLinearLayout.addView(artistTextView);
-                        }
-                    });
-                }
-            });
-        });
-    }
-    public ArrayList<String> getUserTopArtists(String mAccessToken, TopArtistsCallback callback) {
-        ArrayList<String> topArtists = new ArrayList<>(5);
-        if (mAccessToken == null) {
-            Toast.makeText(getActivity(), "get access token", Toast.LENGTH_SHORT).show();
+        LinearLayout myLinearLayout = view.findViewById(R.id.topArtistsLayout);
+        for (String artistName : topArtists) {
+            Log.w("somethig", artistName);
+            LayoutInflater inflater = LayoutInflater.from(getActivity());
+            TextView artistTextView = (TextView) inflater.inflate(R.layout.textview, myLinearLayout, false);
+            artistTextView.setText(artistName);
+            myLinearLayout.addView(artistTextView);
         }
-
-        final Request request = new Request.Builder()
-                .url("https://api.spotify.com/v1/me/top/artists")
-                .addHeader("Authorization", "Bearer " + mAccessToken)
-                .build();
-
-        cancelCall();
-        mCall = mOkHttpClient.newCall(request);
-
-        mCall.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("HTTP", "Failed to fetch data: " + e);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                try {
-                    final JSONObject jsonObject = new JSONObject(response.body().string());
-                    JSONArray itemsArray = jsonObject.getJSONArray("items");
-
-                    for (int i = 0; i < 5; i++) {
-                        JSONObject itemObject = itemsArray.getJSONObject(i);
-                        String name = itemObject.getString("name");
-                        topArtists.add(name);
-                    }
-                    callback.onTopArtistsReceived(topArtists); // Pass data to the callback
-
-
-                } catch (JSONException e) {
-                    Log.d("JSON", "Failed to parse data: " + e);
-                }
-            }
-        });
-        return topArtists;
     }
 
 
@@ -142,17 +94,15 @@ public class TopArtistsFragment extends Fragment {
     private Uri getRedirectUri() {
         return Uri.parse(REDIRECT_URI);
     }
-
     private void cancelCall() {
         if (mCall != null) {
             mCall.cancel();
         }
     }
-    @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
     }
 }
-interface TopArtistsCallback {
-    void onTopArtistsReceived(ArrayList<String> topArtists);
-}
+//interface TopArtistsCallback {
+//    void onTopArtistsReceived(ArrayList<String> topArtists);
+//}

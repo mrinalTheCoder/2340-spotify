@@ -30,28 +30,25 @@ import okhttp3.Response;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link TopSongsFragment#newInstance} factory method to
+ * Use the {@link RecArtistsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TopSongsFragment extends Fragment {
+public class RecArtistsFragment extends Fragment {
 
     private Call mCall;
-    public ArrayList<String> topSongs = new ArrayList<>();
-    private final OkHttpClient mOkHttpClient = new OkHttpClient();
-
-    public static final String REDIRECT_URI = "spotifywrapped://auth";
-    public TopSongsFragment() {
+    public ArrayList<String> recArtists = new ArrayList<>();
+    public RecArtistsFragment() {
         // Required empty public constructor
     }
 
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     @return A new instance of fragment TopSongsFragment.
+     @return A new instance of fragment RecArtistsFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TopSongsFragment newInstance(String param1, String param2) {
-        TopSongsFragment fragment = new TopSongsFragment();
+    public static RecArtistsFragment newInstance(String param1, String param2) {
+        RecArtistsFragment fragment = new RecArtistsFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -69,34 +66,20 @@ public class TopSongsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =   inflater.inflate(R.layout.fragment_top_songs, container, false);
-        ArrayList<String> topSongs = getArguments().getStringArrayList("top_songs");
-        this.topSongs = topSongs;
-
+        View view =   inflater.inflate(R.layout.fragment_rec_artists, container, false);
+        this.recArtists = getArguments().getStringArrayList("rec_artists");
         return view;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-
-        LinearLayout myLinearLayout = view.findViewById(R.id.topSongsLayout);
-        for (String songName : topSongs) {
-            Log.w("somethig", songName);
+        LinearLayout myLinearLayout = view.findViewById(R.id.recArtistsLayout);
+        for (String g : recArtists) {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
-            TextView songTextView = (TextView) inflater.inflate(R.layout.textview, myLinearLayout, false);
-            songTextView.setText(songName);
-            myLinearLayout.addView(songTextView);
-        }
-    }
-
-    private Uri getRedirectUri() {
-        return Uri.parse(REDIRECT_URI);
-    }
-    private void cancelCall() {
-        if (mCall != null) {
-            mCall.cancel();
+            TextView recArtistsTextView = (TextView) inflater.inflate(R.layout.textview, myLinearLayout, false);
+            recArtistsTextView.setText(g);
+            myLinearLayout.addView(recArtistsTextView);
         }
     }
     public void onSaveInstanceState(Bundle outState) {
