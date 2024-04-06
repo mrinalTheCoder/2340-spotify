@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        getToken();
+
         Log.d("MainActivity", "User: " + currentUser.getDisplayName() + " logged in.");
 
         // Initialize the views

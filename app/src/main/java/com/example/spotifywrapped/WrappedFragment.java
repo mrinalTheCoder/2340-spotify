@@ -8,12 +8,14 @@ import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 
@@ -56,6 +58,7 @@ public class WrappedFragment extends Fragment {
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
 
     private TextView infoTextView;
+
     public WrappedFragment() {
         // Required empty public constructor
     }
@@ -74,6 +77,7 @@ public class WrappedFragment extends Fragment {
         return fragment;
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,18 +92,347 @@ public class WrappedFragment extends Fragment {
         // Inflate the layout for this fragment
 
         View view = inflater.inflate(R.layout.fragment_wrapped, container, false);
-        ViewPager2 viewPager = view.findViewById(R.id.viewPager);
-        SpotifyInfoAdapter adapter = new SpotifyInfoAdapter(getActivity());
-        viewPager.setAdapter(adapter);
+//        ViewPager2 viewPager = view.findViewById(R.id.viewPager);
+//        SpotifyInfoAdapter adapter = new SpotifyInfoAdapter(getActivity());
+//        viewPager.setAdapter(adapter);
+        getWrappedData(view);
 
         return view;
     }
+
+    public void getWrappedData(View view) {
+        SharedApiTokenViewModel viewModel = new ViewModelProvider(requireActivity()).get(SharedApiTokenViewModel.class);
+        viewModel.getApiToken().observe(getViewLifecycleOwner(), apiToken -> {
+            getUserTopArtists(apiToken, new TopArtistsCallback() {
+                @Override
+                public void onTopArtistsReceived(ArrayList<String> topArtists, ArrayList<String> artistIdsList) {
+                    String artistIds = artistIdsList.get(0);
+                    for (int i = 1; i < artistIdsList.size(); i++) {
+                        artistIds += "," + artistIdsList.get(i);
+                    }
+                    getUserGenre(apiToken, artistIds, new GenreCallback() {
+                        @Override
+                        public void onGenreReceived(ArrayList<String> genre) {
+
+                            getUserTopSongs(apiToken, new TopSongsCallback() {
+                                public void onTopSongsReceived(ArrayList<String> topSongs, ArrayList<String> topId) {
+
+                                    String songIds = topId.get(0);
+                                    for (int i = 1; i < topId.size(); i++) {
+                                        songIds += "," + topId.get(i);
+                                    }
+                                    final String songsIds = songIds;
+                                    getUserAudioFeatures(apiToken, songsIds, new AudioFeaturesCallback() {
+                                        public void onAudioFeaturesReceived(ArrayList<Double> audioFeatures) {
+                                            getRec(apiToken, songsIds, new RecCallback() {
+                                                @Override
+                                                public void onRecReceived(ArrayList<String> recArtists) {
+
+
+                                                    getActivity().runOnUiThread(new Runnable() {
+                                                        @Override
+                                                        public void run() {
+                                                            showViewPager(view, topArtists, topSongs, genre, audioFeatures, recArtists);
+                                                        }
+                                                    });
+
+                                                    Log.w("Top Artists", topArtists.toString());
+                                                    Log.w("Top Songs", topSongs.toString());
+                                                    Log.w("Top Genres", genre.toString());
+                                                    Log.w("Audio Features", audioFeatures.toString());
+                                                    Log.w("Recommended Artists", recArtists.toString());
+                                                }
+                                            });
+
+
+                                        }
+
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    public void getRec(String mAccessToken, String ids, RecCallback callback) {
+        ArrayList<String> recArtists = new ArrayList<>(5);
+        if (mAccessToken == null) {
+            Toast.makeText(getActivity(), "get access token", Toast.LENGTH_SHORT).show();
+        }
+
+//        Log.w("THIS IS THE IDS", ids);
+        final Request request = new Request.Builder()
+                .url("https://api.spotify.com/v1/recommendations?seed_tracks=" + ids)
+                .addHeader("Authorization", "Bearer " + mAccessToken)
+                .build();
+
+        cancelCall();
+        mCall = mOkHttpClient.newCall(request);
+
+        mCall.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("HTTP", "Failed to fetch data: " + e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    final JSONObject jsonObject = new JSONObject(response.body().string());
+                    JSONArray itemsArray = jsonObject.getJSONArray("tracks");
+
+                    for (int i = 0; i < 8; i++) {
+                        JSONObject track = itemsArray.getJSONObject(i);
+                        JSONObject artist = track.getJSONArray("artists").getJSONObject(0);
+                        String artistName = artist.getString("name");
+                        recArtists.add(artistName);
+                    }
+
+                    callback.onRecReceived(recArtists);
+
+
+                } catch (JSONException e) {
+                    Log.d("JSON", "Failed to parse data: " + e);
+                }
+            }
+        });
+    }
+
+    public void getUserGenre(String mAccessToken, String ids, GenreCallback callback) {
+        ArrayList<String> genre = new ArrayList<>(5);
+        if (mAccessToken == null) {
+            Toast.makeText(getActivity(), "get access token", Toast.LENGTH_SHORT).show();
+        }
+
+//        Log.w("THIS IS THE IDS", ids);
+        final Request request = new Request.Builder()
+                .url("https://api.spotify.com/v1/artists?ids=" + ids)
+                .addHeader("Authorization", "Bearer " + mAccessToken)
+                .build();
+
+        cancelCall();
+        mCall = mOkHttpClient.newCall(request);
+
+        mCall.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("HTTP", "Failed to fetch data: " + e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    final JSONObject jsonObject = new JSONObject(response.body().string());
+                    JSONArray itemsArray = jsonObject.getJSONArray("artists");
+                    for (int i = 0; i < itemsArray.length(); i++) {
+                        JSONObject artist = itemsArray.getJSONObject(i);
+                        JSONArray artistGenre = artist.getJSONArray("genres");
+                        for (int j = 0; j < artistGenre.length(); j++) {
+                            genre.add(artistGenre.getString(j));
+                        }
+                    }
+
+                    callback.onGenreReceived(genre);
+
+
+                } catch (JSONException e) {
+                    Log.d("JSON", "Failed to parse data: " + e);
+                }
+            }
+        });
+    }
+
+    public void showViewPager(View view, ArrayList<String> topArtists, ArrayList<String> topSongs, ArrayList<String> genre,
+                              ArrayList<Double> audioFeatures, ArrayList<String> recArtists) {
+        ViewPager2 viewPager = view.findViewById(R.id.viewPager);
+        SpotifyInfoAdapter adapter = new SpotifyInfoAdapter(getActivity(), topArtists, topSongs, genre, audioFeatures, recArtists);
+        viewPager.setAdapter(adapter);
+    }
+
+    public void getUserTopArtists(String mAccessToken, TopArtistsCallback callback) {
+        ArrayList<String> topArtists = new ArrayList<>(5);
+        ArrayList<String> artistIds = new ArrayList<>(5);
+        if (mAccessToken == null) {
+            Toast.makeText(getActivity(), "get access token", Toast.LENGTH_SHORT).show();
+        }
+
+        final Request request = new Request.Builder()
+                .url("https://api.spotify.com/v1/me/top/artists")
+                .addHeader("Authorization", "Bearer " + mAccessToken)
+                .build();
+
+        cancelCall();
+        mCall = mOkHttpClient.newCall(request);
+
+        mCall.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("HTTP", "Failed to fetch data: " + e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    final JSONObject jsonObject = new JSONObject(response.body().string());
+                    JSONArray itemsArray = jsonObject.getJSONArray("items");
+
+                    for (int i = 0; i < 5; i++) {
+                        JSONObject itemObject = itemsArray.getJSONObject(i);
+                        String name = itemObject.getString("name");
+                        String ids = itemObject.getString("id");
+                        topArtists.add(name);
+                        artistIds.add(ids);
+                    }
+                    callback.onTopArtistsReceived(topArtists, artistIds); // Pass data to the callback
+
+
+                } catch (JSONException e) {
+                    Log.d("JSON", "Failed to parse data: " + e);
+                }
+            }
+        });
+    }
+
+    public void getUserAudioFeatures(String mAccessToken, String ids, AudioFeaturesCallback callback) {
+        ArrayList<Double> audioFeatures = new ArrayList<>(5);
+        if (mAccessToken == null) {
+            Toast.makeText(getActivity(), "get access token", Toast.LENGTH_SHORT).show();
+        }
+
+//        Log.w("THIS IS THE IDS", ids);
+        final Request request = new Request.Builder()
+                .url("https://api.spotify.com/v1/audio-features?ids=" + ids)
+                .addHeader("Authorization", "Bearer " + mAccessToken)
+                .build();
+
+        cancelCall();
+        mCall = mOkHttpClient.newCall(request);
+
+        mCall.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("HTTP", "Failed to fetch data: " + e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    final JSONObject jsonObject = new JSONObject(response.body().string());
+                    JSONArray itemsArray = jsonObject.getJSONArray("audio_features");
+
+                    double avgDanceability = calculateAverage("danceability", itemsArray);
+                    double avgAcousticness = calculateAverage("acousticness", itemsArray);
+                    double avgEnergy = calculateAverage("energy", itemsArray);
+                    double avgLiveness = calculateAverage("liveness", itemsArray);
+                    double avgValence = calculateAverage("valence", itemsArray);
+
+                    audioFeatures.add(avgDanceability);
+                    audioFeatures.add(avgAcousticness);
+                    audioFeatures.add(avgEnergy);
+                    audioFeatures.add(avgLiveness);
+                    audioFeatures.add(avgValence);
+
+                    callback.onAudioFeaturesReceived(audioFeatures); // Pass data to the callback
+
+
+                } catch (JSONException e) {
+                    Log.d("JSON", "Failed to parse data: " + e);
+                }
+            }
+        });
+    }
+    private static double calculateAverage(String featureName, JSONArray audioFeatures) throws JSONException {
+        double sum = 0;
+        for (int i = 0; i < audioFeatures.length(); i++) {
+            JSONObject featureObject = audioFeatures.getJSONObject(i);
+            sum += featureObject.getDouble(featureName);
+        }
+        return sum / audioFeatures.length();
+    }
+    public void getUserTopSongs(String mAccessToken, TopSongsCallback callback) {
+        ArrayList<String> topSongs = new ArrayList<>(5);
+        ArrayList<String> topId = new ArrayList<>(5);
+        if (mAccessToken == null) {
+            Toast.makeText(getActivity(), "get access token", Toast.LENGTH_SHORT).show();
+        }
+
+        final Request request = new Request.Builder()
+                .url("https://api.spotify.com/v1/me/top/tracks")
+                .addHeader("Authorization", "Bearer " + mAccessToken)
+                .build();
+
+        cancelCall();
+        mCall = mOkHttpClient.newCall(request);
+
+        mCall.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("HTTP", "Failed to fetch data: " + e);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    final JSONObject jsonObject = new JSONObject(response.body().string());
+                    JSONArray itemsArray = jsonObject.getJSONArray("items");
+
+                    for (int i = 0; i < 5; i++) {
+                        JSONObject itemObject = itemsArray.getJSONObject(i);
+                        String name = itemObject.getString("name");
+                        String id = itemObject.getString("uri");
+                        topSongs.add(name);
+                        topId.add(id.split(":")[2]);
+                    }
+                    callback.onTopSongsReceived(topSongs, topId); // Pass data to the callback
+
+
+                } catch (JSONException e) {
+                    Log.d("JSON", "Failed to parse data: " + e);
+                }
+            }
+        });
+    }
+
+
+
+
+
+
+
+    private Uri getRedirectUri() {
+        return Uri.parse(REDIRECT_URI);
+    }
+
+    private void cancelCall() {
+        if (mCall != null) {
+            mCall.cancel();
+        }
+    }
+}
+
+interface TopArtistsCallback {
+    void onTopArtistsReceived(ArrayList<String> topArtists, ArrayList<String> artistIds);
+}
+
+interface TopSongsCallback {
+    void onTopSongsReceived(ArrayList<String> topSongs, ArrayList<String> topId);
 }
 
 
+interface AudioFeaturesCallback{
+    void onAudioFeaturesReceived(ArrayList<Double> audioFeatures);
+}
 
+interface GenreCallback{
+    void onGenreReceived(ArrayList<String> genre);
+}
 
-
+interface RecCallback{
+    void onRecReceived(ArrayList<String> recArtists);
+}
 
 
 

@@ -2,26 +2,70 @@ package com.example.spotifywrapped;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
-// ...other necessary imports 
+
+import java.util.ArrayList;
+
+import android.os.Bundle;
+// ...other necessary imports
 
 public class SpotifyInfoAdapter extends FragmentStateAdapter {
 
+    public ArrayList<String> topArtists = new ArrayList<>();
+    public ArrayList<String> topSongs = new ArrayList<>();
+
+    public ArrayList<String> genre = new ArrayList<>();
+    public ArrayList<Double> audioFeatures = new ArrayList<>();
+    public ArrayList<String> recArtists = new ArrayList<>();
     public SpotifyInfoAdapter(FragmentActivity fragmentActivity) {
         super(fragmentActivity);
     }
+    public SpotifyInfoAdapter(FragmentActivity activity, ArrayList<String> topArtists, ArrayList<String> topSongs, ArrayList<String> genre, ArrayList<Double> audioFeatures, ArrayList<String> recArtists) {
+        super(activity);
+        this.topArtists = topArtists;
+        this.topSongs = topSongs;
+        this.genre = genre;
+        this.audioFeatures = audioFeatures;
+        this.recArtists = recArtists;
+    }
+
     @Override
     public Fragment createFragment(int position) {
+
         switch (position) {
             case 0:
-                return new TopArtistsFragment(); // Replace with your fragment class
+                Bundle topArtistArgs = new Bundle();
+                topArtistArgs.putStringArrayList("top_artists", topArtists);
+                Fragment topArtistsFragment = new TopArtistsFragment();
+                topArtistsFragment.setArguments(topArtistArgs);
+                return topArtistsFragment;
             case 1:
-                return new TopSongsFragment(); // Replace with your fragment class
+                Bundle topSongArgs = new Bundle();
+                topSongArgs.putStringArrayList("top_songs", topSongs);
+                Fragment topSongsFragment = new TopSongsFragment();
+                topSongsFragment.setArguments(topSongArgs);
+                return topSongsFragment;
             case 2:
-                return new TopSongsFragment(); // Replace with your fragment class
+                Bundle genreArgs = new Bundle();
+                genreArgs.putStringArrayList("genre", genre);
+                Fragment genreFragment = new GenreFragment();
+                genreFragment.setArguments(genreArgs);
+                return genreFragment;
             case 3:
-                return new TopSongsFragment(); // Replace with your fragment class
+                Bundle afArgs = new Bundle();
+                double[] temp = new double[audioFeatures.size()];
+                for (int i = 0; i < temp.length; i++) {
+                    temp[i] = audioFeatures.get(i);
+                }
+                afArgs.putDoubleArray("audio_features", temp);
+                Fragment audioFeaturesFragment = new AudioFeaturesFragment();
+                audioFeaturesFragment.setArguments(afArgs);
+                return audioFeaturesFragment;
             case 4:
-                return new TopSongsFragment(); // Replace with your fragment class
+                Bundle recArgs = new Bundle();
+                recArgs.putStringArrayList("rec_artists", recArtists);
+                Fragment recArtistsFragment = new RecArtistsFragment();
+                recArtistsFragment.setArguments(recArgs);
+                return recArtistsFragment;
             default:
                 return new TopArtistsFragment();
         }

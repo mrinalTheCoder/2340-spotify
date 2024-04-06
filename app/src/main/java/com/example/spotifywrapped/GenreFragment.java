@@ -30,28 +30,25 @@ import okhttp3.Response;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link TopSongsFragment#newInstance} factory method to
+ * Use the {@link GenreFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TopSongsFragment extends Fragment {
+public class GenreFragment extends Fragment {
 
     private Call mCall;
-    public ArrayList<String> topSongs = new ArrayList<>();
-    private final OkHttpClient mOkHttpClient = new OkHttpClient();
-
-    public static final String REDIRECT_URI = "spotifywrapped://auth";
-    public TopSongsFragment() {
+    public ArrayList<String> genre = new ArrayList<>();
+    public GenreFragment() {
         // Required empty public constructor
     }
 
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     @return A new instance of fragment TopSongsFragment.
+     @return A new instance of fragment GenreFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TopSongsFragment newInstance(String param1, String param2) {
-        TopSongsFragment fragment = new TopSongsFragment();
+    public static GenreFragment newInstance(String param1, String param2) {
+        GenreFragment fragment = new GenreFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -69,9 +66,9 @@ public class TopSongsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =   inflater.inflate(R.layout.fragment_top_songs, container, false);
-        ArrayList<String> topSongs = getArguments().getStringArrayList("top_songs");
-        this.topSongs = topSongs;
+        View view =   inflater.inflate(R.layout.fragment_genre, container, false);
+        ArrayList<String> genre = getArguments().getStringArrayList("genre");
+        this.genre = genre;
 
         return view;
     }
@@ -79,24 +76,13 @@ public class TopSongsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-
-        LinearLayout myLinearLayout = view.findViewById(R.id.topSongsLayout);
-        for (String songName : topSongs) {
-            Log.w("somethig", songName);
+        LinearLayout myLinearLayout = view.findViewById(R.id.genreLayout);
+        for (String g : genre) {
+            Log.w("somethig", g);
             LayoutInflater inflater = LayoutInflater.from(getActivity());
-            TextView songTextView = (TextView) inflater.inflate(R.layout.textview, myLinearLayout, false);
-            songTextView.setText(songName);
-            myLinearLayout.addView(songTextView);
-        }
-    }
-
-    private Uri getRedirectUri() {
-        return Uri.parse(REDIRECT_URI);
-    }
-    private void cancelCall() {
-        if (mCall != null) {
-            mCall.cancel();
+            TextView genreTextView = (TextView) inflater.inflate(R.layout.textview, myLinearLayout, false);
+            genreTextView.setText(g);
+            myLinearLayout.addView(genreTextView);
         }
     }
     public void onSaveInstanceState(Bundle outState) {
