@@ -14,8 +14,15 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 
+import com.google.ai.client.generativeai.GenerativeModel;
+import com.google.ai.client.generativeai.java.GenerativeModelFutures;
+import com.google.ai.client.generativeai.type.Content;
+import com.google.ai.client.generativeai.type.GenerateContentResponse;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -59,6 +66,11 @@ public class WrappedFragment extends Fragment {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private FirebaseUser currentUser;
+    private final String geminiApi = "AIzaSyDqL7aF7lzGTpNX_VLcNH7RMQGBoJNJwBM";
+    GenerativeModel gm = new GenerativeModel(/* modelName */ "gemini-pro",
+// Access your API key as a Build Configuration variable (see "Set up your API key" above)
+            /* apiKey */ geminiApi);
+    GenerativeModelFutures model = GenerativeModelFutures.from(gm);
 
     public WrappedFragment() {
         // Required empty public constructor
@@ -168,14 +180,28 @@ public class WrappedFragment extends Fragment {
                                                             showViewPager(view, topArtists, topSongs, genre, audioFeatures, recArtists);
                                                         }
                                                     });
+                                                    Content content = new Content.Builder()
+                                                            .addText(String.format("Describe how I act, think, and dress based on my top spotify artists. Here are my top artists: %s", topArtists.toString()))
+                                                            .build();
+                                                    ListenableFuture<GenerateContentResponse> response = model.generateContent(content);
+                                                    Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
+                                                        @Override
+                                                        public void onSuccess(GenerateContentResponse result) {
+                                                            Log.w("Top Artists", topArtists.toString());
+                                                            Log.w("Top Songs", topSongs.toString());
+                                                            Log.w("Top Genres", genre.toString());
+                                                            Log.w("Audio Features", audioFeatures.toString());
+                                                            Log.w("Recommended Artists", recArtists.toString());
+                                                            String LLMOutput = result.getText();
+                                                            Log.w("How I act, think, dress", LLMOutput);
+                                                            saveToFirestore(topArtists, topSongs, genre, audioFeatures, recArtists, LLMOutput);
+                                                        }
 
-                                                    Log.w("Top Artists", topArtists.toString());
-                                                    Log.w("Top Songs", topSongs.toString());
-                                                    Log.w("Top Genres", genre.toString());
-                                                    Log.w("Audio Features", audioFeatures.toString());
-                                                    Log.w("Recommended Artists", recArtists.toString());
-                                                    String LLMOutput = "TODO: LLM output";
-                                                    saveToFirestore(topArtists, topSongs, genre, audioFeatures, recArtists, LLMOutput);
+                                                        @Override
+                                                        public void onFailure(Throwable t) {
+                                                            t.printStackTrace();
+                                                        }
+                                                    }, getContext().getMainExecutor());
                                                 }
                                             });
                                         }
