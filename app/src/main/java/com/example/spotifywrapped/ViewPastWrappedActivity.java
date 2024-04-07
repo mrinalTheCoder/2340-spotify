@@ -2,6 +2,9 @@ package com.example.spotifywrapped;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
@@ -21,6 +24,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,7 +37,6 @@ public class ViewPastWrappedActivity extends AppCompatActivity {
     private ArrayList<Map<String, Object>> user_wrapped_data;
     private ArrayList<String> docIds = new ArrayList<>();
     private LinearLayout linearLayout;
-    private ViewPager2  viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +44,6 @@ public class ViewPastWrappedActivity extends AppCompatActivity {
         setContentView(R.layout.activity_view_past_wrapped);
 
         linearLayout = findViewById(R.id.container);
-        viewPager = findViewById(R.id.past_wrapped_view_pager);
         getFirestoreData();
     }
 
@@ -100,16 +102,20 @@ public class ViewPastWrappedActivity extends AppCompatActivity {
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    SpotifyInfoAdapter adapter = new SpotifyInfoAdapter(
-                            ViewPastWrappedActivity.this,
-                            (ArrayList<String>) datum.get("topArtists"),
-                            (ArrayList<String>) datum.get("topSongs"),
-                            (ArrayList<String>) datum.get("genre"),
-                            (ArrayList<Double>) datum.get("audioFeatures"),
-                            (ArrayList<String>) datum.get("recArtists")
-                    );
-                    Log.d("debugging", "here");
-                    viewPager.setAdapter(adapter);
+                    Bundle bundle = new Bundle();
+                    bundle.putBoolean("querySpotify", false);
+                    bundle.putSerializable("pastWrappedData", (Serializable) datum);
+
+                    // Create fragment instance and set arguments
+                    WrappedFragment fragment = new WrappedFragment();
+                    fragment.setArguments(bundle);
+
+                    // Transaction
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.container, fragment);
+                    fragmentTransaction.addToBackStack(null); // Optional for back button
+                    fragmentTransaction.commit();
                 }
             });
             TextView textTimestamp = cardView.findViewById(R.id.textTimestamp);

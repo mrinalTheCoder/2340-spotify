@@ -4,6 +4,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import android.os.Bundle;
 // ...other necessary imports
@@ -26,6 +27,15 @@ public class SpotifyInfoAdapter extends FragmentStateAdapter {
         this.genre = genre;
         this.audioFeatures = audioFeatures;
         this.recArtists = recArtists;
+    }
+
+    public SpotifyInfoAdapter(FragmentActivity activity, Map<String, Object> spotifyData) {
+        super(activity);
+        this.topArtists = (ArrayList<String>) spotifyData.get("topArtists");
+        this.topSongs = (ArrayList<String>) spotifyData.get("topSongs");
+        this.genre = (ArrayList<String>) spotifyData.get("genre");
+        this.audioFeatures = (ArrayList<Double>) spotifyData.get("audioFeatures");
+        this.recArtists = (ArrayList<String>) spotifyData.get("recArtists");
     }
 
     @Override

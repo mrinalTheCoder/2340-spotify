@@ -47,9 +47,10 @@ import okhttp3.Response;
  */
 public class WrappedFragment extends Fragment {
 
-    private ArrayList<String> topArtists = new ArrayList<>(5);
     private String mAccessToken, mAccessCode;
     private Call mCall;
+    private boolean querySpotify;
+    private Map<String, Object> pastWrappedData;
 
     public static final String CLIENT_ID = "17c3cc6f018c42ce8e1f55bc13f61d99";
     public static final String REDIRECT_URI = "spotifywrapped://auth";
@@ -77,6 +78,8 @@ public class WrappedFragment extends Fragment {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (getArguments() != null) {
             mAccessToken = getArguments().getString("mAccessToken");
+            querySpotify = getArguments().getBoolean("querySpotify", true);
+            pastWrappedData = (Map<String, Object>) getArguments().getSerializable("pastWrappedData");
         }
     }
 
@@ -89,7 +92,12 @@ public class WrappedFragment extends Fragment {
 //        ViewPager2 viewPager = view.findViewById(R.id.viewPager);
 //        SpotifyInfoAdapter adapter = new SpotifyInfoAdapter(getActivity());
 //        viewPager.setAdapter(adapter);
-        getWrappedData(view);
+        Log.d("WrappedFragment", querySpotify ? "Querying Spotify" : "Not querying Spotify");
+        if (querySpotify) {
+            getWrappedData(view);
+        } else {
+            showViewPager(view, pastWrappedData);
+        }
 
         return view;
     }
@@ -274,6 +282,12 @@ public class WrappedFragment extends Fragment {
                               ArrayList<Double> audioFeatures, ArrayList<String> recArtists) {
         ViewPager2 viewPager = view.findViewById(R.id.viewPager);
         SpotifyInfoAdapter adapter = new SpotifyInfoAdapter(getActivity(), topArtists, topSongs, genre, audioFeatures, recArtists);
+        viewPager.setAdapter(adapter);
+    }
+
+    public void showViewPager(View view, Map<String, Object> pastWrappedData) {
+        ViewPager2 viewPager = view.findViewById(R.id.viewPager);
+        SpotifyInfoAdapter adapter = new SpotifyInfoAdapter(getActivity(), pastWrappedData);
         viewPager.setAdapter(adapter);
     }
 
