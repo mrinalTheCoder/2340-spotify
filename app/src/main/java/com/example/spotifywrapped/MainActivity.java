@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         Button codeBtn = (Button) findViewById(R.id.code_btn);
         Button profileBtn = (Button) findViewById(R.id.profile_btn);
         Button wrappedBtn = (Button) findViewById(R.id.wrapped_btn);
+        Button viewPastWrappedBtn = (Button) findViewById(R.id.view_past_wrapped_btn);
 
         // Set the click listeners for the buttons
 
@@ -90,6 +91,11 @@ public class MainActivity extends AppCompatActivity {
 
         wrappedBtn.setOnClickListener((v) -> {
             openWrapped();
+        });
+
+        viewPastWrappedBtn.setOnClickListener((v) -> {
+            Intent intent = new Intent(this, ViewPastWrappedActivity.class);
+            startActivity(intent);
         });
 
     }

@@ -3,25 +3,23 @@ package com.example.spotifywrapped;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import android.widget.Button;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
 
-import com.spotify.sdk.android.auth.AuthorizationClient;
-import com.spotify.sdk.android.auth.AuthorizationRequest;
-import com.spotify.sdk.android.auth.AuthorizationResponse;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -29,11 +27,12 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -48,28 +47,23 @@ import okhttp3.Response;
  */
 public class WrappedFragment extends Fragment {
 
-    private ArrayList<String> topArtists = new ArrayList<>(5);
     private String mAccessToken, mAccessCode;
     private Call mCall;
+    private boolean querySpotify;
+    private Map<String, Object> pastWrappedData;
 
     public static final String CLIENT_ID = "17c3cc6f018c42ce8e1f55bc13f61d99";
     public static final String REDIRECT_URI = "spotifywrapped://auth";
 
     private final OkHttpClient mOkHttpClient = new OkHttpClient();
 
-    private TextView infoTextView;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseUser currentUser;
 
     public WrappedFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment WrappedFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static WrappedFragment newInstance() {
         WrappedFragment fragment = new WrappedFragment();
         Bundle args = new Bundle();
@@ -81,8 +75,11 @@ public class WrappedFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (getArguments() != null) {
             mAccessToken = getArguments().getString("mAccessToken");
+            querySpotify = getArguments().getBoolean("querySpotify", true);
+            pastWrappedData = (Map<String, Object>) getArguments().getSerializable("pastWrappedData");
         }
     }
 
@@ -95,9 +92,45 @@ public class WrappedFragment extends Fragment {
 //        ViewPager2 viewPager = view.findViewById(R.id.viewPager);
 //        SpotifyInfoAdapter adapter = new SpotifyInfoAdapter(getActivity());
 //        viewPager.setAdapter(adapter);
-        getWrappedData(view);
+        Log.d("WrappedFragment", querySpotify ? "Querying Spotify" : "Not querying Spotify");
+        if (querySpotify) {
+            getWrappedData(view);
+        } else {
+            showViewPager(view, pastWrappedData);
+        }
 
         return view;
+    }
+
+    private void saveToFirestore(
+            ArrayList<String> topArtists,
+            ArrayList<String> topSongs,
+            ArrayList<String> genre,
+            ArrayList<Double> audioFeatures,
+            ArrayList<String> recArtists,
+            String LLMOutput) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("time", new Date());
+        data.put("topArtists", topArtists);
+        data.put("topSongs", topSongs);
+        data.put("genre", genre);
+        data.put("audioFeatures", audioFeatures);
+        data.put("recArtists", recArtists);
+        data.put("LLMOutput", LLMOutput);
+        db.collection(currentUser.getUid())
+                .add(data)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d("firestore", "DocumentSnapshot written with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("firestore", "Error adding document", e);
+                    }
+                });
     }
 
     public void getWrappedData(View view) {
@@ -141,10 +174,10 @@ public class WrappedFragment extends Fragment {
                                                     Log.w("Top Genres", genre.toString());
                                                     Log.w("Audio Features", audioFeatures.toString());
                                                     Log.w("Recommended Artists", recArtists.toString());
+                                                    String LLMOutput = "TODO: LLM output";
+                                                    saveToFirestore(topArtists, topSongs, genre, audioFeatures, recArtists, LLMOutput);
                                                 }
                                             });
-
-
                                         }
 
                                     });
@@ -249,6 +282,12 @@ public class WrappedFragment extends Fragment {
                               ArrayList<Double> audioFeatures, ArrayList<String> recArtists) {
         ViewPager2 viewPager = view.findViewById(R.id.viewPager);
         SpotifyInfoAdapter adapter = new SpotifyInfoAdapter(getActivity(), topArtists, topSongs, genre, audioFeatures, recArtists);
+        viewPager.setAdapter(adapter);
+    }
+
+    public void showViewPager(View view, Map<String, Object> pastWrappedData) {
+        ViewPager2 viewPager = view.findViewById(R.id.viewPager);
+        SpotifyInfoAdapter adapter = new SpotifyInfoAdapter(getActivity(), pastWrappedData);
         viewPager.setAdapter(adapter);
     }
 
