@@ -10,7 +10,12 @@
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="1dp"></LinearLayout>
+        android:orientation="vertical" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/past_wrapped_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="1000dp"
+        app:layout_constraintTop_toBottomOf="@+id/container" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
