@@ -69,6 +69,20 @@
 
         </LinearLayout>
 
+        <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/view_past_wrapped_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:text="View Past Spotify Wrapped" />
+        </LinearLayout>
+
     </LinearLayout>
 
 
