@@ -83,6 +83,13 @@
             android:text="View Past Spotify Wrapped" />
         </LinearLayout>
 
+        <Button
+            android:id="@+id/acc_mgmt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="Account Management" />
+
     </LinearLayout>
 
 
