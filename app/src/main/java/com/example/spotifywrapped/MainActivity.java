@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         Button profileBtn = (Button) findViewById(R.id.profile_btn);
         Button wrappedBtn = (Button) findViewById(R.id.wrapped_btn);
         Button viewPastWrappedBtn = (Button) findViewById(R.id.view_past_wrapped_btn);
+        Button accMgmt = (Button) findViewById(R.id.acc_mgmt);
 
         // Set the click listeners for the buttons
 
@@ -93,9 +94,16 @@ public class MainActivity extends AppCompatActivity {
             openWrapped();
         });
 
+        accMgmt.setOnClickListener((v) -> {
+            Intent intent = new Intent(this, AccountManagement.class);
+            startActivity(intent);
+            finish();
+        });
+
         viewPastWrappedBtn.setOnClickListener((v) -> {
             Intent intent = new Intent(this, ViewPastWrappedActivity.class);
             startActivity(intent);
+            finish();
         });
 
     }
