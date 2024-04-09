@@ -51,7 +51,6 @@ public class AccountManagement extends AppCompatActivity {
         updateProfileBtn.setOnClickListener((v) -> {
             Intent intent = new Intent(AccountManagement.this, UpdateProfileActivity.class);
             startActivity(intent);
-            finish();
         });
     }
 
