@@ -2,10 +2,8 @@ package com.example.spotifywrapped;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +16,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -37,6 +36,7 @@ public class ViewPastWrappedActivity extends AppCompatActivity {
     private ArrayList<Map<String, Object>> user_wrapped_data;
     private ArrayList<String> docIds = new ArrayList<>();
     private LinearLayout linearLayout;
+    private final SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,8 +122,8 @@ public class ViewPastWrappedActivity extends AppCompatActivity {
             TextView textTopArtist = cardView.findViewById(R.id.textTopArtist);
             TextView textTopSong = cardView.findViewById(R.id.textTopSong);
 
-            // textTimestamp.setText(df.format(datum.get("time")));
-            textTimestamp.setText(datum.get("time").toString());
+            Timestamp timestamp = (Timestamp) datum.get("time");
+            textTimestamp.setText(df.format(timestamp.toDate()));
             textTopArtist.setText(
                     "Top Artist: " +
                     ((ArrayList<String>) datum.get("topArtists")).get(0)
