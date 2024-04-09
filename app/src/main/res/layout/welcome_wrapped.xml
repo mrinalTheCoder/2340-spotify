@@ -26,7 +26,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="224dp"
         android:layout_marginEnd="8dp"
-        android:alpha="0.5"
+        android:alpha="0.8"
         android:fontFamily="@font/oxanium_bold"
         android:lineSpacingExtra="4dp"
         android:text="SPOTIFY WRAPPED"
