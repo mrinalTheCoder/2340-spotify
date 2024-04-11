@@ -1,9 +1,29 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.Spotify_Wrapped" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryContainer">@color/colorPrimaryContainer</item>
+        <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="colorSecondaryContainer">@color/colorSecondaryContainer</item>
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorError">@color/white</item>
+        <item name="colorOnError">@color/white</item>
+        <item name="android:statusBarColor">@color/colorPrimaryDark</item>
+        <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="buttonStyle">@style/ButtonStyle.SpotifyWrapped</item>
+        <item name="textAppearanceHeadline1">@style/TextAppearance.SpotifyWrapped.Headline</item>
+    </style>
 
-    <style name="Theme.Spotify_Wrapped" parent="Base.Theme.Spotify_Wrapped">
-        <!-- Transparent system bars for edge-to-edge. -->
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
+    <style name="ButtonStyle.SpotifyWrapped" parent="Widget.Material3.Button">
+        <item name="backgroundTint">@color/colorAccent</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="TextAppearance.SpotifyWrapped.Headline" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:fontFamily">@font/font</item>
     </style>
 </resources>

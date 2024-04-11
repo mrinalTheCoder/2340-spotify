@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_account_management"
+        android:icon="@drawable/ic_account_management"
+        android:title="Account Management" />
+    <item
+        android:id="@+id/nav_past_wrapped"
+        android:icon="@drawable/ic_past_wrapped"
+        android:title="Past Wrapped" />
+</menu>

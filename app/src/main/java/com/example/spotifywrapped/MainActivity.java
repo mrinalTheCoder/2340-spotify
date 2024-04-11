@@ -1,4 +1,5 @@
 package com.example.spotifywrapped;
+import androidx.core.view.GravityCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.net.Uri;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -34,6 +36,13 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import android.os.Bundle;
+import androidx.appcompat.widget.Toolbar;
+
+
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.drawerlayout.widget.DrawerLayout;
+import com.google.android.material.navigation.NavigationView;
 public class MainActivity extends AppCompatActivity {
 
     public static final String CLIENT_ID = "17c3cc6f018c42ce8e1f55bc13f61d99";
@@ -47,69 +56,70 @@ public class MainActivity extends AppCompatActivity {
     private Call mCall;
 
     private TextView tokenTextView, codeTextView, profileTextView;
+    private DrawerLayout drawerLayout;
+    private ActionBarDrawerToggle toggle;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // After setting the toolbar as action bar, you can use it
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         FirebaseApp.initializeApp(this);
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser == null) {
+            // Redirect to Authentication Activity if no user is currently logged in.
             Intent intent = new Intent(this, AuthActivity.class);
             startActivity(intent);
-        }
-        currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        Log.d("MainActivity", "User: " + currentUser.getDisplayName() + " logged in.");
-
-        // Initialize the views
-        tokenTextView = (TextView) findViewById(R.id.token_text_view);
-        codeTextView = (TextView) findViewById(R.id.code_text_view);
-        profileTextView = (TextView) findViewById(R.id.response_text_view);
-
-        // Initialize the buttons
-        Button tokenBtn = (Button) findViewById(R.id.token_btn);
-        Button codeBtn = (Button) findViewById(R.id.code_btn);
-        Button profileBtn = (Button) findViewById(R.id.profile_btn);
-        Button wrappedBtn = (Button) findViewById(R.id.wrapped_btn);
-        Button viewPastWrappedBtn = (Button) findViewById(R.id.view_past_wrapped_btn);
-        Button accMgmt = (Button) findViewById(R.id.acc_mgmt);
-
-        // Set the click listeners for the buttons
-
-        tokenBtn.setOnClickListener((v) -> {
-            getToken();
-        });
-
-        codeBtn.setOnClickListener((v) -> {
-            getCode();
-        });
-
-        profileBtn.setOnClickListener((v) -> {
-            onGetUserProfileClicked();
-        });
-
-        wrappedBtn.setOnClickListener((v) -> {
-            getToken();
+            // Consider finishing MainActivity if you don't want users to return here without being authenticated
+            finish();
+        } else {
+            // Log the name of the logged-in user.
+            Log.d("MainActivity", "User: " + currentUser.getDisplayName() + " logged in.");
             openWrapped();
-        });
-
-        accMgmt.setOnClickListener((v) -> {
-            Intent intent = new Intent(this, AccountManagement.class);
-            startActivity(intent);
-            finish();
-        });
-
-        viewPastWrappedBtn.setOnClickListener((v) -> {
-            Intent intent = new Intent(this, ViewPastWrappedActivity.class);
-            startActivity(intent);
-            finish();
-        });
-
+        }
+        initializeNavigationDrawer();
     }
+
+    private void initializeNavigationDrawer() {
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        navigationView.setNavigationItemSelectedListener(item -> {
+            int id = item.getItemId();
+            Intent intent;
+            if (id == R.id.nav_account_management) {
+                intent = new Intent(MainActivity.this, AccountManagement.class);
+                startActivity(intent);
+            } else if (id == R.id.nav_past_wrapped) {
+                intent = new Intent(MainActivity.this, ViewPastWrappedActivity.class);
+                startActivity(intent);
+            }
+            // Close the navigation drawer
+            DrawerLayout drawer = findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
+            return true;
+        });
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (toggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public void openWrapped() {
-        LinearLayout la = findViewById(R.id.startBtns);
-        la.setVisibility(View.GONE);
         // Bundle to hold the data
         Bundle bundle = new Bundle();
         bundle.putString("mAccessToken", mAccessToken);
