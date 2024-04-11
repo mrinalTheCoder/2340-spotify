@@ -2,10 +2,18 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="130dp"
-    android:layout_margin="10dp"
-    app:cardBackgroundColor="#EAA1A1"
-    app:cardCornerRadius="10dp">
+    android:layout_height="100dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginTop="32dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginBottom="32dp"
+    app:cardBackgroundColor="#1DB954"
+    app:cardCornerRadius="20dp"
+    android:padding="16dp">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -18,6 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="namePlaceholder"
+            android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -29,6 +38,7 @@
             android:layout_below="@id/textTimestamp"
             android:layout_marginTop="8dp"
             android:text="datePlaceholder"
+            android:textColor="#FFFFFF"
             android:textSize="14sp" />
 
         <!-- Time TextView -->
@@ -39,6 +49,7 @@
             android:layout_below="@id/textTopArtist"
             android:layout_marginTop="4dp"
             android:text="coursePlaceholder"
+            android:textColor="#FFFFFF"
             android:textSize="14sp" />
 
         <!-- Delete Button -->
@@ -50,7 +61,10 @@
             android:layout_alignParentEnd="true"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:src="@android:drawable/ic_delete" />
+            android:background="#1DB954"
+            android:src="@android:drawable/btn_dialog" />
 
     </RelativeLayout>
+</LinearLayout>
+
 </androidx.cardview.widget.CardView>
