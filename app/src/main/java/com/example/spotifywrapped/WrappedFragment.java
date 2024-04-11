@@ -1,5 +1,8 @@
 package com.example.spotifywrapped;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -8,6 +11,7 @@ import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.lifecycle.ViewModelProvider;
@@ -29,6 +33,10 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -41,6 +49,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import jp.shts.android.storiesprogressview.StoriesProgressView;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -52,7 +61,7 @@ import okhttp3.Response;
  * Use the {@link WrappedFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class WrappedFragment extends Fragment {
+public class WrappedFragment extends Fragment implements StoriesProgressView.StoriesListener {
 
     private String mAccessToken, mAccessCode;
     private Call mCall;
@@ -71,6 +80,49 @@ public class WrappedFragment extends Fragment {
 // Access your API key as a Build Configuration variable (see "Set up your API key" above)
             /* apiKey */ geminiApi);
     GenerativeModelFutures model = GenerativeModelFutures.from(gm);
+
+    private static final int PROGRESS_COUNT = 6;
+
+    private StoriesProgressView storiesProgressView;
+    private ImageView image;
+
+    private int counter = 0;
+
+    private ArrayList<Bitmap> bitmapresources = new ArrayList<>();
+
+    private final long[] durations = new long[]{
+            500L, 1000L, 1500L, 4000L, 5000L, 1000,
+    };
+
+    long pressTime = 0L;
+    long limit = 500L;
+
+    private View.OnTouchListener onTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    pressTime = System.currentTimeMillis();
+                    storiesProgressView.pause();
+                    return false;
+                case MotionEvent.ACTION_UP:
+                    long now = System.currentTimeMillis();
+                    storiesProgressView.resume();
+                    return limit < now - pressTime;
+            }
+            return false;
+        }
+    };
+
+    private static Bitmap getBitmapFromView(View view) {
+        view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(), view.getMeasuredHeight(),
+                Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+        view.draw(canvas);
+        return bitmap;
+    }
 
     public WrappedFragment() {
         // Required empty public constructor
@@ -106,7 +158,7 @@ public class WrappedFragment extends Fragment {
 //        viewPager.setAdapter(adapter);
         Log.d("WrappedFragment", querySpotify ? "Querying Spotify" : "Not querying Spotify");
         if (querySpotify) {
-            getWrappedData(view);
+            getWrappedData(view, savedInstanceState);
         } else {
             showViewPager(view, pastWrappedData);
         }
@@ -145,7 +197,105 @@ public class WrappedFragment extends Fragment {
                 });
     }
 
-    public void getWrappedData(View view) {
+    public void displayWrapped(View view, Bundle savedInstanceState, ArrayList<String> topArtists, ArrayList<String> topSongs, ArrayList<String> genre, ArrayList<Double> audioFeatures, ArrayList<String> recArtists) {
+        View view1 = getLayoutInflater().inflate(R.layout.welcome_wrapped, null);
+        Bitmap bitmap1 = getBitmapFromView(view1);
+        bitmapresources.add(bitmap1);
+
+        View view2 = getLayoutInflater().inflate(R.layout.topartists_wrapped, null);
+        ((TextView) view2.findViewById(R.id.artist1)).setText(topArtists.get(0));
+        ((TextView) view2.findViewById(R.id.artist2)).setText(topArtists.get(1));
+        ((TextView) view2.findViewById(R.id.artist3)).setText(topArtists.get(2));
+        ((TextView) view2.findViewById(R.id.artist4)).setText(topArtists.get(3));
+        ((TextView) view2.findViewById(R.id.artist5)).setText(topArtists.get(4));
+        Bitmap bitmap2 = getBitmapFromView(view2);
+        bitmapresources.add(bitmap2);
+
+        View view3 = getLayoutInflater().inflate(R.layout.topsongs_wrapped, null);
+        ((TextView) view3.findViewById(R.id.song1)).setText(topSongs.get(0));
+        ((TextView) view3.findViewById(R.id.song2)).setText(topSongs.get(1));
+        ((TextView) view3.findViewById(R.id.song3)).setText(topSongs.get(2));
+        ((TextView) view3.findViewById(R.id.song4)).setText(topSongs.get(3));
+        ((TextView) view3.findViewById(R.id.song5)).setText(topSongs.get(4));
+        Bitmap bitmap3 = getBitmapFromView(view3);
+        bitmapresources.add(bitmap3);
+
+        View view4 = getLayoutInflater().inflate(R.layout.topgenres_wrapped, null);
+        ((TextView) view4.findViewById(R.id.genre1)).setText(genre.get(0));
+        ((TextView) view4.findViewById(R.id.genre2)).setText(genre.get(1));
+        ((TextView) view4.findViewById(R.id.genre3)).setText(genre.get(2));
+        ((TextView) view4.findViewById(R.id.genre4)).setText(genre.get(3));
+        ((TextView) view4.findViewById(R.id.genre5)).setText(genre.get(4));
+        Bitmap bitmap4 = getBitmapFromView(view4);
+        bitmapresources.add(bitmap4);
+
+        View view5 = getLayoutInflater().inflate(R.layout.audiofeatures_wrapped, null);
+        ProgressBar progressBar1 = (ProgressBar) view5.findViewById(R.id.progressBar18);
+        ProgressBar progressBar2 = (ProgressBar) view5.findViewById(R.id.progressBar12);
+        ProgressBar progressBar3 = (ProgressBar) view5.findViewById(R.id.progressBar13);
+        ProgressBar progressBar4 = (ProgressBar) view5.findViewById(R.id.progressBar14);
+        ProgressBar progressBar5 = (ProgressBar) view5.findViewById(R.id.progressBar16);
+        progressBar1.setProgress((int) (100 * audioFeatures.get(0)));
+        progressBar2.setProgress((int) (100 * audioFeatures.get(1)));
+        progressBar3.setProgress((int) (100 * audioFeatures.get(2)));
+        progressBar4.setProgress((int) (100 * audioFeatures.get(3)));
+        progressBar5.setProgress((int) (100 * audioFeatures.get(4)));
+        progressBar1.getProgressDrawable().setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN);
+        progressBar2.getProgressDrawable().setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN);
+        progressBar3.getProgressDrawable().setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN);
+        progressBar4.getProgressDrawable().setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN);
+        progressBar5.getProgressDrawable().setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN);
+        Bitmap bitmap5 = getBitmapFromView(view5);
+        bitmapresources.add(bitmap5);
+
+        View view6 = getLayoutInflater().inflate(R.layout.recartists_wrapped, null);
+        ((TextView) view6.findViewById(R.id.recArtist1)).setText(recArtists.get(0));
+        ((TextView) view6.findViewById(R.id.recArtist2)).setText(recArtists.get(1));
+        ((TextView) view6.findViewById(R.id.recArtist3)).setText(recArtists.get(2));
+        ((TextView) view6.findViewById(R.id.recArtist4)).setText(recArtists.get(3));
+        ((TextView) view6.findViewById(R.id.recArtist5)).setText(recArtists.get(4));
+        Bitmap bitmap6 = getBitmapFromView(view6);
+        bitmapresources.add(bitmap6);
+
+        super.onCreate(savedInstanceState);
+        getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getActivity().setContentView(R.layout.activity_main);
+
+        storiesProgressView = (StoriesProgressView) getActivity().findViewById(R.id.stories);
+        storiesProgressView.setStoriesCount(PROGRESS_COUNT);
+        storiesProgressView.setStoryDuration(3000L);
+        // or
+        // storiesProgressView.setStoriesCountWithDurations(durations);
+        storiesProgressView.setStoriesListener((StoriesProgressView.StoriesListener) this);
+//        storiesProgressView.startStories();
+        counter = 0;
+        storiesProgressView.startStories(counter);
+
+        image = (ImageView) getActivity().findViewById(R.id.image);
+        image.setImageBitmap(bitmapresources.get(counter));
+
+        // bind reverse view
+        View reverse = getActivity().findViewById(R.id.reverse);
+        reverse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                storiesProgressView.reverse();
+            }
+        });
+        reverse.setOnTouchListener(onTouchListener);
+
+        // bind skip view
+        View skip = getActivity().findViewById(R.id.skip);
+        skip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                storiesProgressView.skip();
+            }
+        });
+        skip.setOnTouchListener(onTouchListener);
+
+    }
+    public void getWrappedData(View view, Bundle savedInstanceState) {
         SharedApiTokenViewModel viewModel = new ViewModelProvider(requireActivity()).get(SharedApiTokenViewModel.class);
         viewModel.getApiToken().observe(getViewLifecycleOwner(), apiToken -> {
             getUserTopArtists(apiToken, new TopArtistsCallback() {
@@ -185,6 +335,8 @@ public class WrappedFragment extends Fragment {
                                                     Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
                                                         @Override
                                                         public void onSuccess(GenerateContentResponse result) {
+                                                            displayWrapped(view, savedInstanceState, topArtists, topSongs, genre, audioFeatures, recArtists);
+
                                                             Log.w("Top Artists", topArtists.toString());
                                                             Log.w("Top Songs", topSongs.toString());
                                                             Log.w("Top Genres", genre.toString());
@@ -459,8 +611,27 @@ public class WrappedFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onNext() {
+        image.setImageBitmap(bitmapresources.get(++counter));;
+    }
 
+    @Override
+    public void onPrev() {
+        if ((counter - 1) < 0) return;
+        image.setImageBitmap(bitmapresources.get(--counter));
+    }
 
+    @Override
+    public void onComplete() {
+    }
+
+    @Override
+    public void onDestroy() {
+        // Very important !
+        storiesProgressView.destroy();
+        super.onDestroy();
+    }
 
 
 
