@@ -109,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.replace(R.id.fragment_container, fragment);
         fragmentTransaction.addToBackStack(null); // Optional for back button
         fragmentTransaction.commit();
+
+        startActivity(new Intent(MainActivity.this, com.example.spotifywrapped.DisplayWrappedActivity.class));
     }
 
     /**
