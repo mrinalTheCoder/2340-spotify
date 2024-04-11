@@ -60,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         }
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        getToken();
         Log.d("MainActivity", "User: " + currentUser.getDisplayName() + " logged in.");
 
         // Initialize the views
@@ -68,18 +67,11 @@ public class MainActivity extends AppCompatActivity {
         profileTextView = (TextView) findViewById(R.id.response_text_view);
 
         // Initialize the buttons
-        Button profileBtn = (Button) findViewById(R.id.profile_btn);
         Button wrappedBtn = (Button) findViewById(R.id.wrapped_btn);
         Button viewPastWrappedBtn = (Button) findViewById(R.id.view_past_wrapped_btn);
         Button accMgmt = (Button) findViewById(R.id.acc_mgmt);
 
         // Set the click listeners for the buttons
-
-
-
-        profileBtn.setOnClickListener((v) -> {
-            onGetUserProfileClicked();
-        });
 
         wrappedBtn.setOnClickListener((v) -> {
             getToken();
