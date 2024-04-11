@@ -172,8 +172,6 @@ public class WrappedFragment extends Fragment {
                                             getRec(apiToken, songsIds, new RecCallback() {
                                                 @Override
                                                 public void onRecReceived(ArrayList<String> recArtists) {
-
-
                                                     getActivity().runOnUiThread(new Runnable() {
                                                         @Override
                                                         public void run() {
