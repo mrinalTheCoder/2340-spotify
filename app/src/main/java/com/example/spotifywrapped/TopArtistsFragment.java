@@ -1,45 +1,41 @@
 package com.example.spotifywrapped;
 
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-
-import androidx.lifecycle.ViewModelProvider;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.ArrayList;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link TopArtistsFragment#newInstance} factory method to
+ * Use the {@link WelcomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class TopArtistsFragment extends Fragment {
 
-    private Call mCall;
-    public ArrayList<String> topArtists = new ArrayList<>();
-    private final OkHttpClient mOkHttpClient = new OkHttpClient();
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
 
-    public static final String REDIRECT_URI = "spotifywrapped://auth";
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+
+    private ArrayList<String> topArtists;
+    private Bundle bundle;
+
     public TopArtistsFragment() {
         // Required empty public constructor
     }
@@ -47,12 +43,17 @@ public class TopArtistsFragment extends Fragment {
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     @return A new instance of fragment TopArtistsFragment.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment WelcomeFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TopArtistsFragment newInstance(String param1, String param2) {
-        TopArtistsFragment fragment = new TopArtistsFragment();
+    public static WelcomeFragment newInstance(String param1, String param2) {
+        WelcomeFragment fragment = new WelcomeFragment();
         Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,48 +62,42 @@ public class TopArtistsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+            bundle = getArguments();
+            topArtists = (ArrayList<String>) ((HashMap<String, Object>) getArguments().getSerializable("data")).get("topArtists");
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view =   inflater.inflate(R.layout.fragment_top_artists, container, false);
-        ArrayList<String> topArtists = getArguments().getStringArrayList("top_artists");
-        this.topArtists = topArtists;
 
-        return view;
-    }
+        LayoutInflater lf = getActivity().getLayoutInflater();
+        View inflateview =  lf.inflate(R.layout.fragment_top_artists, container, false);
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        LinearLayout myLinearLayout = view.findViewById(R.id.topArtistsLayout);
-        for (String artistName : topArtists) {
-            Log.w("somethig", artistName);
-            LayoutInflater inflater = LayoutInflater.from(getActivity());
-            TextView artistTextView = (TextView) inflater.inflate(R.layout.textview, myLinearLayout, false);
-            artistTextView.setText(artistName);
-            myLinearLayout.addView(artistTextView);
-        }
-    }
+        ((TextView) inflateview.findViewById(R.id.artist1)).setText(topArtists.get(0));
+        ((TextView) inflateview.findViewById(R.id.artist2)).setText(topArtists.get(1));
+        ((TextView) inflateview.findViewById(R.id.artist3)).setText(topArtists.get(2));
+        ((TextView) inflateview.findViewById(R.id.artist4)).setText(topArtists.get(3));
+        ((TextView) inflateview.findViewById(R.id.artist5)).setText(topArtists.get(4));
 
-
-
-    private Uri getRedirectUri() {
-        return Uri.parse(REDIRECT_URI);
-    }
-    private void cancelCall() {
-        if (mCall != null) {
-            mCall.cancel();
-        }
-    }
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+        Button button = (Button) inflateview.findViewById(R.id.button2);
+        button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                TopSongsFragment fragment = new TopSongsFragment();
+                fragment.setArguments(bundle);
+//        // Transaction
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container, fragment);
+                fragmentTransaction.addToBackStack(null); // Optional for back button
+                fragmentTransaction.commit();
+            }
+        });
+        return inflateview;
     }
 }
-//interface TopArtistsCallback {
-//    void onTopArtistsReceived(ArrayList<String> topArtists);
-//}

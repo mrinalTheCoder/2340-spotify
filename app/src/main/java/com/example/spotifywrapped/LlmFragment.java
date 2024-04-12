@@ -1,5 +1,6 @@
 package com.example.spotifywrapped;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -21,7 +22,7 @@ import java.util.HashMap;
  * Use the {@link WelcomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class GenreFragment extends Fragment {
+public class LlmFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -32,9 +33,9 @@ public class GenreFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     private Bundle bundle;
-    private ArrayList<String> genre;
 
-    public GenreFragment() {
+    private String llmOutput;
+    public LlmFragment() {
         // Required empty public constructor
     }
 
@@ -63,7 +64,7 @@ public class GenreFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
             bundle = getArguments();
-            genre = (ArrayList<String>) ((HashMap<String, Object>) bundle.getSerializable("data")).get("genre");
+            llmOutput = (String) ((HashMap<String, Object>) bundle.getSerializable("data")).get("LLMOutput");
         }
     }
 
@@ -72,13 +73,9 @@ public class GenreFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         LayoutInflater lf = getActivity().getLayoutInflater();
-        View inflateview =  lf.inflate(R.layout.fragment_genre, container, false);
+        View inflateview =  lf.inflate(R.layout.fragment_llm, container, false);
 
-        ((TextView) inflateview.findViewById(R.id.genre1)).setText(genre.get(0));
-        ((TextView) inflateview.findViewById(R.id.genre2)).setText(genre.get(1));
-        ((TextView) inflateview.findViewById(R.id.genre3)).setText(genre.get(2));
-        ((TextView) inflateview.findViewById(R.id.genre4)).setText(genre.get(3));
-        ((TextView) inflateview.findViewById(R.id.genre5)).setText(genre.get(4));
+        ((TextView) inflateview.findViewById(R.id.textView6)).setText(llmOutput);
 
         Button button = (Button) inflateview.findViewById(R.id.button2);
         button.setOnClickListener(new View.OnClickListener()
@@ -86,14 +83,8 @@ public class GenreFragment extends Fragment {
             @Override
             public void onClick(View v)
             {
-                AudioFeaturesFragment fragment = new AudioFeaturesFragment();
-                fragment.setArguments(bundle);
-//        // Transaction
-                FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, fragment);
-                fragmentTransaction.addToBackStack(null); // Optional for back button
-                fragmentTransaction.commit();
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                startActivity(intent);
             }
         });
         return inflateview;

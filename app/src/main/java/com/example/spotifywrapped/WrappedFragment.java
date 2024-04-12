@@ -1,5 +1,8 @@
 package com.example.spotifywrapped;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -8,8 +11,11 @@ import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -29,6 +35,10 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -41,6 +51,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import jp.shts.android.storiesprogressview.StoriesProgressView;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -91,7 +102,7 @@ public class WrappedFragment extends Fragment {
         if (getArguments() != null) {
             mAccessToken = getArguments().getString("mAccessToken");
             querySpotify = getArguments().getBoolean("querySpotify", true);
-            pastWrappedData = (Map<String, Object>) getArguments().getSerializable("pastWrappedData");
+            pastWrappedData = (Map<String, Object>) getArguments().getSerializable("data");
         }
     }
 
@@ -106,29 +117,15 @@ public class WrappedFragment extends Fragment {
 //        viewPager.setAdapter(adapter);
         Log.d("WrappedFragment", querySpotify ? "Querying Spotify" : "Not querying Spotify");
         if (querySpotify) {
-            getWrappedData(view);
+            getWrappedData(view, savedInstanceState);
         } else {
-            showViewPager(view, pastWrappedData);
+            openWrapped(pastWrappedData);
         }
 
         return view;
     }
 
-    private void saveToFirestore(
-            ArrayList<String> topArtists,
-            ArrayList<String> topSongs,
-            ArrayList<String> genre,
-            ArrayList<Double> audioFeatures,
-            ArrayList<String> recArtists,
-            String LLMOutput) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("time", new Date());
-        data.put("topArtists", topArtists);
-        data.put("topSongs", topSongs);
-        data.put("genre", genre);
-        data.put("audioFeatures", audioFeatures);
-        data.put("recArtists", recArtists);
-        data.put("LLMOutput", LLMOutput);
+    private void saveToFirestore(Map<String, Object> data) {
         db.collection(currentUser.getUid())
                 .add(data)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -145,7 +142,7 @@ public class WrappedFragment extends Fragment {
                 });
     }
 
-    public void getWrappedData(View view) {
+        public void getWrappedData(View view, Bundle savedInstanceState) {
         SharedApiTokenViewModel viewModel = new ViewModelProvider(requireActivity()).get(SharedApiTokenViewModel.class);
         viewModel.getApiToken().observe(getViewLifecycleOwner(), apiToken -> {
             getUserTopArtists(apiToken, new TopArtistsCallback() {
@@ -175,31 +172,42 @@ public class WrappedFragment extends Fragment {
                                                     getActivity().runOnUiThread(new Runnable() {
                                                         @Override
                                                         public void run() {
-                                                            showViewPager(view, topArtists, topSongs, genre, audioFeatures, recArtists);
+                                                            // showViewPager(view, topArtists, topSongs, genre, audioFeatures, recArtists);
+                                                            Content content = new Content.Builder()
+                                                                    .addText(String.format("Describe how I act, think, and dress based on my top spotify artists in 75 words or less. Here are my top artists: %s", topArtists.toString()))
+                                                                    .build();
+                                                            ListenableFuture<GenerateContentResponse> response = model.generateContent(content);
+                                                            Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
+                                                                @Override
+                                                                public void onSuccess(GenerateContentResponse result) {
+                                                                    Log.w("Top Artists", topArtists.toString());
+                                                                    Log.w("Top Songs", topSongs.toString());
+                                                                    Log.w("Top Genres", genre.toString());
+                                                                    Log.w("Audio Features", audioFeatures.toString());
+                                                                    Log.w("Recommended Artists", recArtists.toString());
+                                                                    String LLMOutput = result.getText();
+                                                                    Log.w("How I act, think, dress", LLMOutput);
+
+                                                                    Map<String, Object> data = new HashMap<>();
+                                                                    data.put("time", new Date());
+                                                                    data.put("topArtists", topArtists);
+                                                                    data.put("topSongs", topSongs);
+                                                                    data.put("genre", genre);
+                                                                    data.put("audioFeatures", audioFeatures);
+                                                                    data.put("recArtists", recArtists);
+                                                                    data.put("LLMOutput", LLMOutput);
+
+                                                                    saveToFirestore(data);
+                                                                     openWrapped(data);
+                                                                }
+
+                                                                @Override
+                                                                public void onFailure(Throwable t) {
+                                                                    t.printStackTrace();
+                                                                }
+                                                            }, getContext().getMainExecutor());
                                                         }
                                                     });
-                                                    Content content = new Content.Builder()
-                                                            .addText(String.format("Describe how I act, think, and dress based on my top spotify artists. Here are my top artists: %s", topArtists.toString()))
-                                                            .build();
-                                                    ListenableFuture<GenerateContentResponse> response = model.generateContent(content);
-                                                    Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
-                                                        @Override
-                                                        public void onSuccess(GenerateContentResponse result) {
-                                                            Log.w("Top Artists", topArtists.toString());
-                                                            Log.w("Top Songs", topSongs.toString());
-                                                            Log.w("Top Genres", genre.toString());
-                                                            Log.w("Audio Features", audioFeatures.toString());
-                                                            Log.w("Recommended Artists", recArtists.toString());
-                                                            String LLMOutput = result.getText();
-                                                            Log.w("How I act, think, dress", LLMOutput);
-                                                            saveToFirestore(topArtists, topSongs, genre, audioFeatures, recArtists, LLMOutput);
-                                                        }
-
-                                                        @Override
-                                                        public void onFailure(Throwable t) {
-                                                            t.printStackTrace();
-                                                        }
-                                                    }, getContext().getMainExecutor());
                                                 }
                                             });
                                         }
@@ -212,6 +220,21 @@ public class WrappedFragment extends Fragment {
                 }
             });
         });
+    }
+
+    private void openWrapped(Map<String, Object> data) {
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("data", (HashMap<String, Object>) data);
+
+        WelcomeFragment welcomeFragment = new WelcomeFragment();
+        welcomeFragment.setArguments(bundle);
+
+        // Transaction
+        FragmentManager welcomefragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction welcomefragmentTransaction = welcomefragmentManager.beginTransaction();
+        welcomefragmentTransaction.replace(R.id.fragment_container, welcomeFragment);
+        welcomefragmentTransaction.addToBackStack(null); // Optional for back button
+        welcomefragmentTransaction.commit();
     }
 
     public void getRec(String mAccessToken, String ids, RecCallback callback) {
@@ -458,12 +481,6 @@ public class WrappedFragment extends Fragment {
             }
         });
     }
-
-
-
-
-
-
 
     private Uri getRedirectUri() {
         return Uri.parse(REDIRECT_URI);
