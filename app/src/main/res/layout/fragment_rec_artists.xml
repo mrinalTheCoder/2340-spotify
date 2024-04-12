@@ -13,11 +13,13 @@
         android:id="@+id/imageView"
         android:layout_width="413dp"
         android:layout_height="743dp"
+        android:layout_marginTop="4dp"
         android:alpha="0.9"
-        android:scaleType="centerCrop"
 
+        android:scaleType="centerCrop"
         android:src="@drawable/recartistsbg"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -26,7 +28,7 @@
         android:layout_width="392dp"
         android:layout_height="181dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="124dp"
+        android:layout_marginTop="112dp"
         android:layout_marginEnd="8dp"
         android:alpha="1"
         android:fontFamily="@font/oxanium_bold"
@@ -38,15 +40,16 @@
         android:textSize="40sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView" />
 
     <TextView
         android:id="@+id/recArtist1"
         android:layout_width="308dp"
-        android:layout_height="140dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="252dp"
+        android:layout_marginTop="280dp"
         android:layout_marginEnd="8dp"
         android:alpha="1"
         android:fontFamily="@font/oxanium_bold"
@@ -65,9 +68,8 @@
     <TextView
         android:id="@+id/recArtist2"
         android:layout_width="308dp"
-        android:layout_height="140dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="404dp"
         android:layout_marginEnd="8dp"
         android:alpha="1"
         android:fontFamily="@font/oxanium_bold"
@@ -81,14 +83,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/recArtist5" />
 
     <TextView
         android:id="@+id/recArtist3"
         android:layout_width="308dp"
-        android:layout_height="140dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="292dp"
         android:layout_marginEnd="8dp"
         android:alpha="1"
         android:fontFamily="@font/oxanium_bold"
@@ -102,14 +103,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/recArtist1" />
 
     <TextView
         android:id="@+id/recArtist4"
         android:layout_width="308dp"
-        android:layout_height="140dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="332dp"
         android:layout_marginEnd="8dp"
         android:alpha="1"
         android:fontFamily="@font/oxanium_bold"
@@ -123,14 +123,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/recArtist3" />
 
     <TextView
         android:id="@+id/recArtist5"
         android:layout_width="308dp"
-        android:layout_height="140dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="368dp"
         android:layout_marginEnd="8dp"
         android:alpha="1"
         android:fontFamily="@font/oxanium_bold"
@@ -144,7 +143,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imageView" />
+        app:layout_constraintTop_toBottomOf="@+id/recArtist4" />
 
     <Button
         android:id="@+id/button2"
