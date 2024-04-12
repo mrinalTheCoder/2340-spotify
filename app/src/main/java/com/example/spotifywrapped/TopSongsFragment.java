@@ -1,45 +1,37 @@
 package com.example.spotifywrapped;
 
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-import androidx.lifecycle.ViewModelProvider;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.ArrayList;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import java.util.Arrays;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link TopSongsFragment#newInstance} factory method to
+ * Use the {@link WelcomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class TopSongsFragment extends Fragment {
 
-    private Call mCall;
-    public ArrayList<String> topSongs = new ArrayList<>();
-    private final OkHttpClient mOkHttpClient = new OkHttpClient();
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
 
-    public static final String REDIRECT_URI = "spotifywrapped://auth";
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+    ArrayList<String> topSongs = new ArrayList<>(Arrays.asList(new String[]{"drive ME crazy!", "Antidote", "I'm a Firefighter", "Novacane", "Pink + White"}));
+
     public TopSongsFragment() {
         // Required empty public constructor
     }
@@ -47,12 +39,17 @@ public class TopSongsFragment extends Fragment {
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     @return A new instance of fragment TopSongsFragment.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment WelcomeFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TopSongsFragment newInstance(String param1, String param2) {
-        TopSongsFragment fragment = new TopSongsFragment();
+    public static WelcomeFragment newInstance(String param1, String param2) {
+        WelcomeFragment fragment = new WelcomeFragment();
         Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,45 +58,39 @@ public class TopSongsFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view =   inflater.inflate(R.layout.fragment_top_songs, container, false);
-        ArrayList<String> topSongs = getArguments().getStringArrayList("top_songs");
-        this.topSongs = topSongs;
 
-        return view;
-    }
+        LayoutInflater lf = getActivity().getLayoutInflater();
+        View inflateview =  lf.inflate(R.layout.fragment_top_songs, container, false);
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        ((TextView) inflateview.findViewById(R.id.song1)).setText(topSongs.get(0));
+        ((TextView) inflateview.findViewById(R.id.song2)).setText(topSongs.get(1));
+        ((TextView) inflateview.findViewById(R.id.song3)).setText(topSongs.get(2));
+        ((TextView) inflateview.findViewById(R.id.song4)).setText(topSongs.get(3));
+        ((TextView) inflateview.findViewById(R.id.song5)).setText(topSongs.get(4));
 
-
-        LinearLayout myLinearLayout = view.findViewById(R.id.topSongsLayout);
-        for (String songName : topSongs) {
-            Log.w("somethig", songName);
-            LayoutInflater inflater = LayoutInflater.from(getActivity());
-            TextView songTextView = (TextView) inflater.inflate(R.layout.textview, myLinearLayout, false);
-            songTextView.setText(songName);
-            myLinearLayout.addView(songTextView);
-        }
-    }
-
-    private Uri getRedirectUri() {
-        return Uri.parse(REDIRECT_URI);
-    }
-    private void cancelCall() {
-        if (mCall != null) {
-            mCall.cancel();
-        }
-    }
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+        Button button = (Button) inflateview.findViewById(R.id.button2);
+        button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                GenreFragment fragment = new GenreFragment();
+//        // Transaction
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container, fragment);
+                fragmentTransaction.addToBackStack(null); // Optional for back button
+                fragmentTransaction.commit();
+            }
+        });
+        return inflateview;
     }
 }

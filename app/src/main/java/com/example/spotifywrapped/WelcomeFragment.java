@@ -10,17 +10,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link WelcomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class TopArtistsFragment extends Fragment {
+public class WelcomeFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -31,9 +27,7 @@ public class TopArtistsFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    ArrayList<String> topArtists = new ArrayList<>(Arrays.asList(new String[]{"Daniel Caesar", "Frank Ocean", "Brent Faiyaz", "Drake", "Kanye West"}));
-
-    public TopArtistsFragment() {
+    public WelcomeFragment() {
         // Required empty public constructor
     }
 
@@ -67,23 +61,15 @@ public class TopArtistsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        LayoutInflater lf = getActivity().getLayoutInflater();
-        View inflateview =  lf.inflate(R.layout.fragment_top_artists, container, false);
-
-        ((TextView) inflateview.findViewById(R.id.artist1)).setText(topArtists.get(0));
-        ((TextView) inflateview.findViewById(R.id.artist2)).setText(topArtists.get(1));
-        ((TextView) inflateview.findViewById(R.id.artist3)).setText(topArtists.get(2));
-        ((TextView) inflateview.findViewById(R.id.artist4)).setText(topArtists.get(3));
-        ((TextView) inflateview.findViewById(R.id.artist5)).setText(topArtists.get(4));
-
-        Button button = (Button) inflateview.findViewById(R.id.button2);
+        View view = inflater.inflate(R.layout.fragment_welcome,
+                container, false);
+        Button button = (Button) view.findViewById(R.id.button2);
         button.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                TopSongsFragment fragment = new TopSongsFragment();
+                TopArtistsFragment fragment = new TopArtistsFragment();
 //        // Transaction
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -92,6 +78,6 @@ public class TopArtistsFragment extends Fragment {
                 fragmentTransaction.commit();
             }
         });
-        return inflateview;
+        return view;
     }
 }

@@ -1,4 +1,5 @@
 package com.example.spotifywrapped;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
@@ -99,18 +100,26 @@ public class MainActivity extends AppCompatActivity {
         bundle.putString("mAccessToken", mAccessToken);
         bundle.putString("mAccessCode", mAccessCode);
 
-        // Create fragment instance and set arguments
-        WrappedFragment fragment = new WrappedFragment();
-        fragment.setArguments(bundle);
+         //Create fragment instance and set arguments
+        WelcomeFragment welcomeFragment = new WelcomeFragment();
+        welcomeFragment.setArguments(bundle);
+//
+//        // Transaction
+        FragmentManager welcomefragmentManager = getSupportFragmentManager();
+        FragmentTransaction welcomefragmentTransaction = welcomefragmentManager.beginTransaction();
+        welcomefragmentTransaction.replace(R.id.fragment_container, welcomeFragment);
+        welcomefragmentTransaction.addToBackStack(null); // Optional for back button
+        welcomefragmentTransaction.commit();
 
-        // Transaction
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, fragment);
-        fragmentTransaction.addToBackStack(null); // Optional for back button
-        fragmentTransaction.commit();
-
-        startActivity(new Intent(MainActivity.this, com.example.spotifywrapped.DisplayWrappedActivity.class));
+//        WrappedFragment fragment = new WrappedFragment();
+//        fragment.setArguments(bundle);
+////
+////        // Transaction
+//        FragmentManager fragmentManager = getSupportFragmentManager();
+//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//        fragmentTransaction.replace(R.id.fragment_container, fragment);
+//        fragmentTransaction.addToBackStack(null); // Optional for back button
+//        fragmentTransaction.commit();
     }
 
     /**

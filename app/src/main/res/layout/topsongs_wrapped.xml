@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#78C8D0"
-    tools:context=".DisplayWrappedActivity">
+    tools:context=".DisplayFragment">
 
 
     <ImageView
