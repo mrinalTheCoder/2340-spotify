@@ -102,7 +102,7 @@ public class WrappedFragment extends Fragment {
         if (getArguments() != null) {
             mAccessToken = getArguments().getString("mAccessToken");
             querySpotify = getArguments().getBoolean("querySpotify", true);
-            pastWrappedData = (Map<String, Object>) getArguments().getSerializable("pastWrappedData");
+            pastWrappedData = (Map<String, Object>) getArguments().getSerializable("data");
         }
     }
 
@@ -119,7 +119,7 @@ public class WrappedFragment extends Fragment {
         if (querySpotify) {
             getWrappedData(view, savedInstanceState);
         } else {
-            showViewPager(view, pastWrappedData);
+            openWrapped(pastWrappedData);
         }
 
         return view;

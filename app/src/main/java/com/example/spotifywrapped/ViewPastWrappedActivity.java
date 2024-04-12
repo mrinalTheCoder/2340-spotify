@@ -57,7 +57,6 @@ public class ViewPastWrappedActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d("firestore_query", document.getId() + " => " + document.getData());
                                 user_wrapped_data.add(document.getData());
                                 docIds.add(document.getId());
                             }
@@ -102,9 +101,12 @@ public class ViewPastWrappedActivity extends AppCompatActivity {
             cardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    LinearLayout la = findViewById(R.id.container);
+                    la.setVisibility(View.GONE);
+
                     Bundle bundle = new Bundle();
                     bundle.putBoolean("querySpotify", false);
-                    bundle.putSerializable("pastWrappedData", (Serializable) datum);
+                    bundle.putSerializable("data", (Serializable) datum);
 
                     // Create fragment instance and set arguments
                     WrappedFragment fragment = new WrappedFragment();
@@ -113,7 +115,7 @@ public class ViewPastWrappedActivity extends AppCompatActivity {
                     // Transaction
                     FragmentManager fragmentManager = getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.container, fragment);
+                    fragmentTransaction.replace(R.id.fragment_container, fragment);
                     fragmentTransaction.addToBackStack(null); // Optional for back button
                     fragmentTransaction.commit();
                 }
