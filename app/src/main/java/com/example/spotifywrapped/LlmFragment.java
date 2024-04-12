@@ -1,6 +1,5 @@
 package com.example.spotifywrapped;
 
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +20,7 @@ import java.util.Arrays;
  * Use the {@link WelcomeFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AudioFeaturesFragment extends Fragment {
+public class LlmFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -31,9 +30,9 @@ public class AudioFeaturesFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    ArrayList<Double> audioFeatures = new ArrayList<>(Arrays.asList(new Double[]{0.5689999999999999, 0.31728, 0.5892, 0.2512, 0.394599999999999951}));
 
-    public AudioFeaturesFragment() {
+    String llmOutput = "Your taste in music suggests a thoughtful and introspective side. You likely value soulful lyrics that explore themes of love, desire, and navigating complex emotions. You might be drawn to intellectual conversations and appreciate artists who push boundaries. When it comes to style, you could lean towards comfortable yet put-together looks. Think streetwear with a touch of luxury, like a crisp pair of sneakers paired with a designer bomber jacket. But don't be surprised if you throw on a classic hoodie and sweatpants for a chill day, all with an air of quiet confidence.";
+    public LlmFragment() {
         // Required empty public constructor
     }
 
@@ -68,25 +67,10 @@ public class AudioFeaturesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
         LayoutInflater lf = getActivity().getLayoutInflater();
-        View inflateview =  lf.inflate(R.layout.fragment_audio_features, container, false);
+        View inflateview =  lf.inflate(R.layout.fragment_llm, container, false);
 
-        ProgressBar progressBar1 = (ProgressBar) inflateview.findViewById(R.id.progressBar18);
-        ProgressBar progressBar2 = (ProgressBar) inflateview.findViewById(R.id.progressBar12);
-        ProgressBar progressBar3 = (ProgressBar) inflateview.findViewById(R.id.progressBar13);
-        ProgressBar progressBar4 = (ProgressBar) inflateview.findViewById(R.id.progressBar14);
-        ProgressBar progressBar5 = (ProgressBar) inflateview.findViewById(R.id.progressBar16);
-        progressBar1.setProgress((int) (100 * audioFeatures.get(0)));
-        progressBar2.setProgress((int) (100 * audioFeatures.get(1)));
-        progressBar3.setProgress((int) (100 * audioFeatures.get(2)));
-        progressBar4.setProgress((int) (100 * audioFeatures.get(3)));
-        progressBar5.setProgress((int) (100 * audioFeatures.get(4)));
-        progressBar1.getProgressDrawable().setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN);
-        progressBar2.getProgressDrawable().setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN);
-        progressBar3.getProgressDrawable().setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN);
-        progressBar4.getProgressDrawable().setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN);
-        progressBar5.getProgressDrawable().setColorFilter(Color.WHITE, android.graphics.PorterDuff.Mode.SRC_IN);
+        ((TextView) inflateview.findViewById(R.id.textView6)).setText(llmOutput);
 
         Button button = (Button) inflateview.findViewById(R.id.button2);
         button.setOnClickListener(new View.OnClickListener()
@@ -94,7 +78,7 @@ public class AudioFeaturesFragment extends Fragment {
             @Override
             public void onClick(View v)
             {
-                LlmFragment fragment = new LlmFragment();
+                RecArtistsFragment fragment = new RecArtistsFragment();
 //        // Transaction
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
