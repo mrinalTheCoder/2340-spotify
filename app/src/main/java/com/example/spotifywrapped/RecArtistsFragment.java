@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,8 +32,9 @@ public class RecArtistsFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private Bundle bundle;
 
-    ArrayList<String> recArtists = new ArrayList<>(Arrays.asList(new String[]{"Mac Miller", "dandelion hands", "Cigs After Sex", "The Alchemist", "BROCKHAMPTON", "Brent Faiyaz", "Jesse", "Frank Ocean"}));
+    private ArrayList<String> recArtists;
     private static final int PROGRESS_COUNT = 6;
 
     public RecArtistsFragment() {
@@ -63,6 +65,8 @@ public class RecArtistsFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+            bundle = getArguments();
+            recArtists = (ArrayList<String>) ((HashMap<String, Object>) bundle.getSerializable("data")).get("recArtists");
         }
     }
 
@@ -85,8 +89,14 @@ public class RecArtistsFragment extends Fragment {
             @Override
             public void onClick(View v)
             {
-                Intent intent = new Intent(getActivity(), MainActivity.class);
-                startActivity(intent);
+                LlmFragment fragment = new LlmFragment();
+                fragment.setArguments(bundle);
+                // Transaction
+                FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.fragment_container, fragment);
+                fragmentTransaction.addToBackStack(null); // Optional for back button
+                fragmentTransaction.commit();
             }
         });
         return inflateview;

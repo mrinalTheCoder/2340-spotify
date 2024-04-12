@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import java.util.HashMap;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link WelcomeFragment#newInstance} factory method to
@@ -26,6 +28,7 @@ public class WelcomeFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private HashMap<String, Object> data;
 
     public WelcomeFragment() {
         // Required empty public constructor
@@ -55,6 +58,7 @@ public class WelcomeFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+            data = (HashMap<String, Object>) getArguments().getSerializable("data");
         }
     }
 
@@ -69,8 +73,10 @@ public class WelcomeFragment extends Fragment {
             @Override
             public void onClick(View v)
             {
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("data", data);
                 TopArtistsFragment fragment = new TopArtistsFragment();
-//        // Transaction
+                fragment.setArguments(bundle);
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.fragment_container, fragment);

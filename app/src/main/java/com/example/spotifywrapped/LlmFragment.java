@@ -1,5 +1,6 @@
 package com.example.spotifywrapped;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,8 +32,9 @@ public class LlmFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private Bundle bundle;
 
-    String llmOutput = "Your taste in music suggests a thoughtful and introspective side. You likely value soulful lyrics that explore themes of love, desire, and navigating complex emotions. You might be drawn to intellectual conversations and appreciate artists who push boundaries. When it comes to style, you could lean towards comfortable yet put-together looks. Think streetwear with a touch of luxury, like a crisp pair of sneakers paired with a designer bomber jacket. But don't be surprised if you throw on a classic hoodie and sweatpants for a chill day, all with an air of quiet confidence.";
+    private String llmOutput;
     public LlmFragment() {
         // Required empty public constructor
     }
@@ -60,6 +63,8 @@ public class LlmFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+            bundle = getArguments();
+            llmOutput = (String) ((HashMap<String, Object>) bundle.getSerializable("data")).get("LLMOutput");
         }
     }
 
@@ -78,13 +83,8 @@ public class LlmFragment extends Fragment {
             @Override
             public void onClick(View v)
             {
-                RecArtistsFragment fragment = new RecArtistsFragment();
-//        // Transaction
-                FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, fragment);
-                fragmentTransaction.addToBackStack(null); // Optional for back button
-                fragmentTransaction.commit();
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                startActivity(intent);
             }
         });
         return inflateview;
