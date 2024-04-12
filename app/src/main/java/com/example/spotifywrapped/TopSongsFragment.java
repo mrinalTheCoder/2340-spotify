@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -30,7 +31,8 @@ public class TopSongsFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    ArrayList<String> topSongs = new ArrayList<>(Arrays.asList(new String[]{"drive ME crazy!", "Antidote", "I'm a Firefighter", "Novacane", "Pink + White"}));
+    private Bundle bundle;
+    private ArrayList<String> topSongs;
 
     public TopSongsFragment() {
         // Required empty public constructor
@@ -60,6 +62,8 @@ public class TopSongsFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+            bundle = getArguments();
+            topSongs = (ArrayList<String>) ((HashMap<String, Object>) bundle.getSerializable("data")).get("topSongs");
         }
     }
 
@@ -83,6 +87,7 @@ public class TopSongsFragment extends Fragment {
             public void onClick(View v)
             {
                 GenreFragment fragment = new GenreFragment();
+                fragment.setArguments(bundle);
 //        // Transaction
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

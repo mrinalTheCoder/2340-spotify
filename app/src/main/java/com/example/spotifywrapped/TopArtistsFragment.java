@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,7 +33,8 @@ public class TopArtistsFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    ArrayList<String> topArtists = new ArrayList<>(Arrays.asList(new String[]{"Daniel Caesar", "Frank Ocean", "Brent Faiyaz", "Drake", "Kanye West"}));
+    private ArrayList<String> topArtists;
+    private Bundle bundle;
 
     public TopArtistsFragment() {
         // Required empty public constructor
@@ -61,6 +64,8 @@ public class TopArtistsFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+            bundle = getArguments();
+            topArtists = (ArrayList<String>) ((HashMap<String, Object>) getArguments().getSerializable("data")).get("topArtists");
         }
     }
 
@@ -84,6 +89,7 @@ public class TopArtistsFragment extends Fragment {
             public void onClick(View v)
             {
                 TopSongsFragment fragment = new TopSongsFragment();
+                fragment.setArguments(bundle);
 //        // Transaction
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();

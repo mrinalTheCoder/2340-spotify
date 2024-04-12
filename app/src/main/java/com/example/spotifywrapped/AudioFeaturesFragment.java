@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,7 +32,8 @@ public class AudioFeaturesFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    ArrayList<Double> audioFeatures = new ArrayList<>(Arrays.asList(new Double[]{0.5689999999999999, 0.31728, 0.5892, 0.2512, 0.394599999999999951}));
+    private Bundle bundle;
+    private ArrayList<Double> audioFeatures;
 
     public AudioFeaturesFragment() {
         // Required empty public constructor
@@ -61,6 +63,8 @@ public class AudioFeaturesFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+            bundle = getArguments();
+            audioFeatures = (ArrayList<Double>) ((HashMap<String, Object>) bundle.getSerializable("data")).get("audioFeatures");
         }
     }
 
@@ -95,6 +99,7 @@ public class AudioFeaturesFragment extends Fragment {
             public void onClick(View v)
             {
                 RecArtistsFragment fragment = new RecArtistsFragment();
+                fragment.setArguments(bundle);
 //        // Transaction
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
