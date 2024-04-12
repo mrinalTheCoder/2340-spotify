@@ -33,5 +33,12 @@
             android:layout_margin="8dp"
             android:text="Delete Account" />
 
+        <Button
+            android:id="@+id/btnHome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:text="Back to Home" />
+
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

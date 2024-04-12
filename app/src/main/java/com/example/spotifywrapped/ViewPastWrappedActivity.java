@@ -5,9 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -45,6 +47,15 @@ public class ViewPastWrappedActivity extends AppCompatActivity {
 
         linearLayout = findViewById(R.id.container);
         getFirestoreData();
+
+        Button homeBtn = (Button) findViewById(R.id.btnHome);
+        homeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ViewPastWrappedActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void getFirestoreData() {

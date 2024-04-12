@@ -52,6 +52,15 @@ public class AccountManagement extends AppCompatActivity {
             Intent intent = new Intent(AccountManagement.this, UpdateProfileActivity.class);
             startActivity(intent);
         });
+
+        Button homeBtn = (Button) findViewById(R.id.btnHome);
+        homeBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(AccountManagement.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     public void signOut() {
