@@ -1,5 +1,8 @@
 package com.example.spotifywrapped;
 
+import android.content.Intent;
+
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -45,7 +48,19 @@ public class ViewPastWrappedActivity extends AppCompatActivity {
 
         linearLayout = findViewById(R.id.container);
         getFirestoreData();
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(ViewPastWrappedActivity.this, MainActivity.class);
+                startActivity(intent);
+            }
+        };
+
+        // Add the callback to the back button dispatcher
+        getOnBackPressedDispatcher().addCallback(this, callback);
+
     }
+
 
     private void getFirestoreData() {
         user_wrapped_data = new ArrayList<>();

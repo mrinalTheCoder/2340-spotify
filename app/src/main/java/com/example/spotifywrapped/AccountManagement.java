@@ -8,6 +8,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -35,6 +36,17 @@ public class AccountManagement extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_account_management);
+
+        OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(AccountManagement.this, MainActivity.class);
+                startActivity(intent);
+            }
+        };
+
+        // Add the callback to the back button dispatcher
+        getOnBackPressedDispatcher().addCallback(this, callback);
 
         Button signOutBtn = (Button) findViewById(R.id.sign_out);
         signOutBtn.setOnClickListener((v) -> {
