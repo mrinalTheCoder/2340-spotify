@@ -24,6 +24,8 @@
         android:id="@+id/buttonUpdateProfile"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="#1DB954"
+        android:textColor="#FFFFFF"
         android:text="Update Profile"
         android:layout_below="@id/editTextNewPassword"
         android:layout_centerHorizontal="true"
