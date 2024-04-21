@@ -5,9 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:background="#121212"
     tools:context=".AccountManagement">
 
     <LinearLayout
+        android:id="@+id/background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -16,6 +18,8 @@
             android:id="@+id/sign_out"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="#1DB954"
+            android:textColor="#FFFFFF"
             android:layout_margin="8dp"
             android:text="Sign Out" />
 
@@ -23,6 +27,8 @@
             android:id="@+id/update_profile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="#1DB954"
+            android:textColor="#FFFFFF"
             android:layout_margin="8dp"
             android:text="Update Profile" />
 
@@ -30,6 +36,8 @@
             android:id="@+id/delete_account"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="#FF0000"
+            android:textColor="#FFFFFF"
             android:layout_margin="8dp"
             android:text="Delete Account" />
 
