@@ -13,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.view.View;
 import android.widget.Toast;
+import android.widget.PopupMenu;
 
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -73,10 +74,36 @@ public class MainActivity extends AppCompatActivity {
         Button accMgmt = (Button) findViewById(R.id.acc_mgmt);
 
         // Set the click listeners for the buttons
-
+/*
         wrappedBtn.setOnClickListener((v) -> {
             getToken();
             openWrapped();
+        });
+ */
+        wrappedBtn.setOnClickListener(v -> {
+            // Create a PopupMenu
+            PopupMenu popup = new PopupMenu(this, wrappedBtn);
+            // Inflate the menu from XML
+            popup.getMenuInflater().inflate(R.menu.spotify_wrapped_options, popup.getMenu());
+            // Set the click listener for popup menu items
+            popup.setOnMenuItemClickListener(item -> {
+                String timeRange;
+                int itemId = item.getItemId();
+                if (itemId == R.id.option_short_term) {
+                    timeRange = "short_term";
+                } else if (itemId == R.id.option_medium_term) {
+                    timeRange = "medium_term";
+                } else if (itemId == R.id.option_long_term) {
+                    timeRange = "long_term";
+                } else {
+                    return false;
+                }
+                getToken();
+                openWrapped(timeRange);
+                return true;
+            });
+            // Showing the popup menu
+            popup.show();
         });
 
         accMgmt.setOnClickListener((v) -> {
@@ -92,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
-    public void openWrapped() {
+    public void openWrapped(String timeRange) {
         LinearLayout la = findViewById(R.id.startBtns);
         la.setVisibility(View.GONE);
         // Bundle to hold the data
@@ -114,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
         */
 
         WrappedFragment fragment = new WrappedFragment();
+        fragment.timeRange = timeRange;
         fragment.setArguments(bundle);
 
         // Transaction
