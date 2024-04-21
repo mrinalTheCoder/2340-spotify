@@ -66,7 +66,7 @@ import okhttp3.Response;
  * create an instance of this fragment.
  */
 public class WrappedFragment extends Fragment {
-
+    public String timeRange;
     private String mAccessToken, mAccessCode;
     private Call mCall;
     private boolean querySpotify;
@@ -147,7 +147,7 @@ public class WrappedFragment extends Fragment {
         public void getWrappedData(View view, Bundle savedInstanceState) {
         SharedApiTokenViewModel viewModel = new ViewModelProvider(requireActivity()).get(SharedApiTokenViewModel.class);
         viewModel.getApiToken().observe(getViewLifecycleOwner(), apiToken -> {
-            getUserTopArtists(apiToken, new TopArtistsCallback() {
+            getUserTopArtists(apiToken, timeRange, new TopArtistsCallback() {
                 @Override
                 public void onTopArtistsReceived(ArrayList<String> topArtists, ArrayList<String> artistIdsList) {
                     String artistIds = artistIdsList.get(0);
@@ -158,7 +158,7 @@ public class WrappedFragment extends Fragment {
                         @Override
                         public void onGenreReceived(ArrayList<String> genre) {
 
-                            getUserTopSongs(apiToken, new TopSongsCallback() {
+                            getUserTopSongs(apiToken, timeRange, new TopSongsCallback() {
                                 public void onTopSongsReceived(ArrayList<String> topSongs, ArrayList<String> topId) {
 
                                     String songIds = topId.get(0);
@@ -340,7 +340,7 @@ public class WrappedFragment extends Fragment {
         viewPager.setAdapter(adapter);
     }
 
-    public void getUserTopArtists(String mAccessToken, TopArtistsCallback callback) {
+    public void getUserTopArtists(String mAccessToken, String timeRange, TopArtistsCallback callback) {
         ArrayList<String> topArtists = new ArrayList<>(5);
         ArrayList<String> artistIds = new ArrayList<>(5);
         if (mAccessToken == null) {
@@ -348,7 +348,7 @@ public class WrappedFragment extends Fragment {
         }
 
         final Request request = new Request.Builder()
-                .url("https://api.spotify.com/v1/me/top/artists")
+                .url("https://api.spotify.com/v1/me/top/artists?time_range=" + timeRange)
                 .addHeader("Authorization", "Bearer " + mAccessToken)
                 .build();
 
@@ -440,7 +440,7 @@ public class WrappedFragment extends Fragment {
         }
         return sum / audioFeatures.length();
     }
-    public void getUserTopSongs(String mAccessToken, TopSongsCallback callback) {
+    public void getUserTopSongs(String mAccessToken, String timeRange, TopSongsCallback callback) {
         ArrayList<String> topSongs = new ArrayList<>(5);
         ArrayList<String> topId = new ArrayList<>(5);
         if (mAccessToken == null) {
@@ -448,7 +448,7 @@ public class WrappedFragment extends Fragment {
         }
 
         final Request request = new Request.Builder()
-                .url("https://api.spotify.com/v1/me/top/tracks")
+                .url("https://api.spotify.com/v1/me/top/tracks?time_range=" + timeRange)
                 .addHeader("Authorization", "Bearer " + mAccessToken)
                 .build();
 

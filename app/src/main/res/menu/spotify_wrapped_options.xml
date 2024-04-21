@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/option_short_term"
+        android:title="Last 4 Weeks"/>
+    <item
+        android:id="@+id/option_medium_term"
+        android:title="Last 6 Months"/>
+    <item
+        android:id="@+id/option_long_term"
+        android:title="Last 1 Year"/>
+</menu>
